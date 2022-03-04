@@ -8,11 +8,12 @@ public class Perlin : MonoBehaviour
 {
     int _mapSize;
     //int _seed;
-    [SerializeField] float _scale;
     [SerializeField] int _octaves;
     [SerializeField] float _persistence;
 
     System.Random _rand;
+
+    Vector2[,] _gradients;
 
     //public Perlin(int octaves, float persistence, float scale, int mapSize)
     //{
@@ -23,13 +24,20 @@ public class Perlin : MonoBehaviour
     //    //_seed = seed;
     //    //_rand = new System.Random(seed);
     //}
+    public void Init(int seed, int mapSize, float scale)
+    {
+        _rand = new System.Random(seed);
+        _mapSize = mapSize;
+
+        _gradients = GenerateGridGradients();
+    }
 
     public float[,] GenerateHeightMap(int seed, int mapSize)
     {
         _rand = new System.Random(seed);
         _mapSize = mapSize;
 
-        Vector2[,] gradients = GenerateGridGradients();
+        _gradients = GenerateGridGradients();
         float[,] heightMap = new float[_mapSize, _mapSize];
 
         for (int i = 0; i < _mapSize; i++)
@@ -48,7 +56,7 @@ public class Perlin : MonoBehaviour
                 //    y = _chunkSize - 2.0f;
                 //}
 
-                heightMap[i,j] = Mathf.Clamp(Noise(i * .3f, j * .3f, gradients), 0.0f, 1.0f);
+                heightMap[i,j] = Mathf.Clamp(Noise(i * .3f, j * .3f), 0.0f, 1.0f);
             }
         }
 
@@ -57,20 +65,20 @@ public class Perlin : MonoBehaviour
 
     Vector2[,] GenerateGridGradients()
     {
-        Vector2[,] gradients = new Vector2[_mapSize + 1, _mapSize + 1];
+        _gradients = new Vector2[_mapSize + 1, _mapSize + 1];
         for (int i = 0; i < _mapSize; i++)
         {
             for (int j = 0; j < _mapSize; j++)
             {
                 float x = (float)_rand.NextDouble();
                 float y = (float)_rand.NextDouble();
-                gradients[i, j] = new Vector2(x, y);
+                _gradients[i, j] = new Vector2(x, y);
             }
         }
-        return gradients;
+        return _gradients;
     }
 
-    float Noise(float x, float y, Vector2[,] gradients)
+    public float Noise(float x, float y)
     {
         // find cell origin and corners
         //Vector2 cell = new Vector2Int(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y));
@@ -96,23 +104,23 @@ public class Perlin : MonoBehaviour
         float sx = x - (float)x0;
         float sy = y - (float)y0;
 
-        float n0 = DotGridGradient(x0, y0, x, y, gradients);
-        float n1 = DotGridGradient(x1, y0, x, y, gradients);
+        float n0 = DotGridGradient(x0, y0, x, y);
+        float n1 = DotGridGradient(x1, y0, x, y);
         float ix0 = Interpolate(n0, n1, sx);
-        n0 = DotGridGradient(x0, y1, x, y, gradients);
-        n1 = DotGridGradient(x1, y1, x, y, gradients);
+        n0 = DotGridGradient(x0, y1, x, y);
+        n1 = DotGridGradient(x1, y1, x, y);
         float ix1 = Interpolate(n0, n1, sx);
         float result = Interpolate(ix0, ix1, sy);
 
         return result;
 	}
 
-    float DotGridGradient(int ix, int iy, float x, float y, Vector2[,] gradients)
+    float DotGridGradient(int ix, int iy, float x, float y)
     {
         try
         {
             // get gradient from integer coordinates
-            Vector2 gradient = gradients[ix, iy];
+            Vector2 gradient = _gradients[ix, iy];
 
             // find the offset vector
             float dx = x - (float)ix;

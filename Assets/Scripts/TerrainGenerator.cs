@@ -8,9 +8,9 @@ using UnityEngine;
 public class TerrainGenerator : MonoBehaviour
 {
     [SerializeField] float _maxHeight;
-    [SerializeField] Vector2Int _mapSize;
+    [SerializeField] int _mapSize;
     [SerializeField] int _seed;
-    [SerializeField] float _scale;
+    [SerializeField] [Range(0.0f, 1.0f)] float _scale;
     //[SerializeField] Material _noiseMat;
     //float[,] _heightMap;
     Perlin _perlin;
@@ -60,21 +60,23 @@ public class TerrainGenerator : MonoBehaviour
         //_heightMap = _perlin.GenerateHeightMap();
     }
 
-    void GenerateMesh()
+    public void GenerateMesh()
     {
         // generate height map
-        float[,] _heightMap = _perlin.GenerateHeightMap(926, _mapSize.x);
+        //float[,] _heightMap = _perlin.GenerateHeightMap(926, _mapSize.x);
+        _perlin.Init(_seed, _mapSize, _scale);
 
         // set vertices data from heightmap
-        Vector3[] vertices = new Vector3[(_mapSize.x + 1) * (_mapSize.y + 1)];
+        Vector3[] vertices = new Vector3[(_mapSize + 1) * (_mapSize + 1)];
         int i = 0, y = 0, x = 0;
         try
         {
-            for (i = 0, y = 0; y < _mapSize.y; y++)
+            for (i = 0, y = 0; y < _mapSize; y++)
             {
-                for (x = 0; x < _mapSize.x; x++)
+                for (x = 0; x < _mapSize; x++)
                 {
-                    float height = _heightMap[x, y] * 10.0f;
+                    //float height = _heightMap[x, y] * 10.0f;
+                    float height = _perlin.Noise(x * _scale, y * _scale) * _maxHeight;//Mathf.Clamp(_perlin.Noise(x * _scale, y * _scale), 0.0f, 1.0f) * _maxHeight;
                     vertices[i] = new Vector3(x, height, y);
                     //Debug.Log(x + ", " + height + ", " + y);
                     i++;
@@ -87,20 +89,20 @@ public class TerrainGenerator : MonoBehaviour
         }
 
         // set tri data
-        int[] triangles = new int[_mapSize.x * _mapSize.y * 6];
+        int[] triangles = new int[_mapSize * _mapSize * 6];
         int verts = 0;
         int tris = 0;
 
-        for(i = 0; i < _mapSize.y; i++)
+        for(i = 0; i < _mapSize; i++)
         {
-            for(int j = 0; j < _mapSize.x; j++)
+            for(int j = 0; j < _mapSize; j++)
             {
                 triangles[tris + 0] = verts + 0;
-                triangles[tris + 1] = verts + _mapSize.x + 1;
+                triangles[tris + 1] = verts + _mapSize + 1;
                 triangles[tris + 2] = verts + 1;
                 triangles[tris + 3] = verts + 1;
-                triangles[tris + 4] = verts + _mapSize.x + 1;
-                triangles[tris + 5] = verts + _mapSize.x + 2;
+                triangles[tris + 4] = verts + _mapSize + 1;
+                triangles[tris + 5] = verts + _mapSize + 2;
 
                 verts++;
                 tris += 6;
