@@ -7,45 +7,25 @@ using UnityEngine;
 public class Perlin : MonoBehaviour
 {
     int _mapSize;
-    //int _seed;
     [SerializeField] int _octaves;
     [SerializeField] float _persistence;
-
-    System.Random _rand;
 
     Vector2[,] _gradients;
 
     public void Init(int seed, int mapSize)
     {
-        _rand = new System.Random(seed);
         _mapSize = mapSize;
-
-        _gradients = GenerateGridGradients();
+        _gradients = GenerateGridGradients(seed);
     }
 
     public float[,] GenerateHeightMap(float scale, float maxHeight, Vector2 offset)
     {
-        _gradients = GenerateGridGradients();
         float[,] heightMap = new float[_mapSize, _mapSize];
 
         for (int i = 0; i < _mapSize; i++)
         {
             for(int j = 0; j < _mapSize; j++)
             {
-                //float x = i / 10.0f;
-
-                //if(x >= _chunkSize - 1)
-                //{
-                //    x = _chunkSize - 2.0f;
-                //}
-                //float y = j / 10.0f;
-                //if(y >= _chunkSize - 1)
-                //{
-                //    y = _chunkSize - 2.0f;
-                //}
-
-                //heightMap[i,j] = Mathf.Clamp(Noise(i * .3f, j * .3f), 0.0f, 1.0f);
-
                 float xCoord = (float)i / _mapSize * scale + offset.x;
                 float yCoord = (float)j / _mapSize * scale + offset.y;
 
@@ -56,15 +36,16 @@ public class Perlin : MonoBehaviour
         return heightMap;
     }
 
-    Vector2[,] GenerateGridGradients()
+    Vector2[,] GenerateGridGradients(int seed)
     {
-        _gradients = new Vector2[_mapSize + 1, _mapSize + 1];
+        System.Random rand = new System.Random(seed);
+        _gradients = new Vector2[_mapSize, _mapSize];
         for (int i = 0; i < _mapSize; i++)
         {
             for (int j = 0; j < _mapSize; j++)
             {
-                float x = (float)_rand.NextDouble();
-                float y = (float)_rand.NextDouble();
+                float x = (float)rand.NextDouble();
+                float y = (float)rand.NextDouble();
                 _gradients[i, j] = new Vector2(x, y);
             }
         }
@@ -73,20 +54,6 @@ public class Perlin : MonoBehaviour
 
     public float Noise(float x, float y)
     {
-        // find cell origin and corners
-        //Vector2 cell = new Vector2Int(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y));
-        //// corners to add to origin
-        //Vector2[] corners = new[] { new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 0), new Vector2(1, 1) };
-        //for(int i = 0; i < corners.Length; i++)
-        //{
-        //    // find corner position from cell origin point
-        //    Vector2 currentCorner = corners[i] + cell;
-        //    // find vector from pos to currentcorner
-        //    Vector2 offset = currentCorner - pos;
-        //    // dot prod with gradient
-        //    // interpolate
-        //}
-
         // find positions of each corner
         int x0 = Mathf.FloorToInt(x);
         int x1 = x0 + 1;
@@ -94,8 +61,6 @@ public class Perlin : MonoBehaviour
         int y1 = y0 + 1;
 
         // find interpolation weights
-        //float sx = x - (float)x0;
-        //float sy = y - (float)y0;
         float sx = Fade(x - (float)x0);
         float sy = Fade(y - (float)y0);
 
@@ -140,16 +105,7 @@ public class Perlin : MonoBehaviour
          */
         if (0.0 > w) return a0;
         if (1.0 < w) return a1;
-        float result = (a1 - a0) * w + a0;
-        //if (result < 0.0f)
-        //{
-        //    return 0.0f;
-        //}
-        //else if (result > 1.0f)
-        //{
-        //    return 1.0f;
-        //}
-        return result;
+        return (a1 - a0) * w + a0;
         /* // Use this cubic interpolation [[Smoothstep]] instead, for a smooth appearance:
          * return (a1 - a0) * (3.0 - w * 2.0) * w * w + a0;
          *
