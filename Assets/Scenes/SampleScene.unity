@@ -291,6 +291,7 @@ MonoBehaviour:
   _mapSize: 0
   _seed: 926
   _scale: 1
+  offset: {x: 0, y: 0}
   _terrainObject: {fileID: 1074495206}
 --- !u!4 &390941175
 Transform:
@@ -633,6 +634,7 @@ MonoBehaviour:
   _mapSize: 0
   _seed: 92621
   _scale: 1
+  offset: {x: 0, y: 0}
   _terrainObject: {fileID: 1074495206}
 --- !u!1 &1180547560
 GameObject:
@@ -684,7 +686,8 @@ MonoBehaviour:
   _maxHeight: 20
   _mapSize: 256
   _seed: 92621
-  _scale: 0.2
+  _scale: 20
+  offset: {x: 0, y: 0}
   _terrainObject: {fileID: 1180547560}
 --- !u!65 &1180547563
 BoxCollider:
@@ -757,7 +760,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1180547560}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 20, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

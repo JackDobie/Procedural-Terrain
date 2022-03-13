@@ -15,16 +15,7 @@ public class Perlin : MonoBehaviour
 
     Vector2[,] _gradients;
 
-    //public Perlin(int octaves, float persistence, float scale, int mapSize)
-    //{
-    //    _octaves = octaves;
-    //    _persistence = persistence;
-    //    _mapSize = mapSize;
-    //    _scale = scale;
-    //    //_seed = seed;
-    //    //_rand = new System.Random(seed);
-    //}
-    public void Init(int seed, int mapSize, float scale)
+    public void Init(int seed, int mapSize)
     {
         _rand = new System.Random(seed);
         _mapSize = mapSize;
@@ -101,8 +92,10 @@ public class Perlin : MonoBehaviour
         int y1 = y0 + 1;
 
         // find interpolation weights
-        float sx = x - (float)x0;
-        float sy = y - (float)y0;
+        //float sx = x - (float)x0;
+        //float sy = y - (float)y0;
+        float sx = Fade(x - (float)x0);
+        float sy = Fade(y - (float)y0);
 
         float n0 = DotGridGradient(x0, y0, x, y);
         float n1 = DotGridGradient(x1, y0, x, y);
@@ -143,12 +136,14 @@ public class Perlin : MonoBehaviour
          * if (0.0 > w) return a0;
          * if (1.0 < w) return a1;
          */
+        if (0.0 > w) return a0;
+        if (1.0 < w) return a1;
         float result = (a1 - a0) * w + a0;
-        //if(result < 0.0f)
+        //if (result < 0.0f)
         //{
         //    return 0.0f;
         //}
-        //if(result > 1.0f)
+        //else if (result > 1.0f)
         //{
         //    return 1.0f;
         //}
@@ -161,6 +156,7 @@ public class Perlin : MonoBehaviour
          */
     }
 
+    // Fade function defined by Ken Perlin. Eases coordinate values so that they will ease towards integral values. This smooths the final output
     float Fade(float t)
     {
         return t * t * t * (t * (t * 6 - 15) + 10);

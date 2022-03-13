@@ -10,13 +10,18 @@ public class TerrainGenerator : MonoBehaviour
     [SerializeField] float _maxHeight;
     [SerializeField] int _mapSize;
     [SerializeField] int _seed;
-    [SerializeField] [Range(0.0f, 1.0f)] float _scale;
-    //[SerializeField] Material _noiseMat;
-    //float[,] _heightMap;
+    [SerializeField] /*[Range(0.0f, 1.0f)]*/ float _scale;
+    [SerializeField] Vector2 offset;
     Perlin _perlin;
     [SerializeField] GameObject _terrainObject;
-    //MeshFilter _meshFilter;
     Mesh _mesh;
+
+    private void OnValidate()
+    {
+        // ensure that offset is in range
+        offset.x = Mathf.Clamp(offset.x, 0, _mapSize - 1);
+        offset.y = Mathf.Clamp(offset.y, 0, _mapSize - 1);
+    }
 
     void Awake()
     {
@@ -64,20 +69,23 @@ public class TerrainGenerator : MonoBehaviour
     {
         // generate height map
         //float[,] _heightMap = _perlin.GenerateHeightMap(926, _mapSize.x);
-        _perlin.Init(_seed, _mapSize, _scale);
+        _perlin.Init(_seed, _mapSize);
 
         // set vertices data from heightmap
         Vector3[] vertices = new Vector3[(_mapSize + 1) * (_mapSize + 1)];
-        int i = 0, y = 0, x = 0;
+        int i = 0, z = 0, x = 0;
         try
         {
-            for (i = 0, y = 0; y < _mapSize; y++)
+            for (i = 0, z = 0; z < _mapSize; z++)
             {
                 for (x = 0; x < _mapSize; x++)
                 {
                     //float height = _heightMap[x, y] * 10.0f;
-                    float height = _perlin.Noise(x * _scale, y * _scale) * _maxHeight;//Mathf.Clamp(_perlin.Noise(x * _scale, y * _scale), 0.0f, 1.0f) * _maxHeight;
-                    vertices[i] = new Vector3(x, height, y);
+                    float xCoord = (float)x / _mapSize * _scale + offset.x;
+                    float yCoord = (float)z / _mapSize * _scale + offset.y;
+                    //float height = _perlin.Noise(x * _scale, z * _scale) * _maxHeight;//Mathf.Clamp(_perlin.Noise(x * _scale, y * _scale), 0.0f, 1.0f) * _maxHeight;
+                    float height = _perlin.Noise(xCoord, yCoord) * _maxHeight;//Mathf.Clamp(_perlin.Noise(x * _scale, y * _scale), 0.0f, 1.0f) * _maxHeight;
+                    vertices[i] = new Vector3(x, height, z);
                     //Debug.Log(x + ", " + height + ", " + y);
                     i++;
                 }
@@ -85,7 +93,7 @@ public class TerrainGenerator : MonoBehaviour
         }
         catch(Exception e)
         {
-            Debug.LogError("Out of range: i=" + i + ", y=" + y + ", x=" + x);
+            Debug.LogError("Out of range: i=" + i + ", z=" + z + ", x=" + x);
         }
 
         // set tri data
