@@ -23,11 +23,8 @@ public class Perlin : MonoBehaviour
         _gradients = GenerateGridGradients();
     }
 
-    public float[,] GenerateHeightMap(int seed, int mapSize)
+    public float[,] GenerateHeightMap(float scale, int maxHeight, Vector2 offset)
     {
-        _rand = new System.Random(seed);
-        _mapSize = mapSize;
-
         _gradients = GenerateGridGradients();
         float[,] heightMap = new float[_mapSize, _mapSize];
 
@@ -47,7 +44,12 @@ public class Perlin : MonoBehaviour
                 //    y = _chunkSize - 2.0f;
                 //}
 
-                heightMap[i,j] = Mathf.Clamp(Noise(i * .3f, j * .3f), 0.0f, 1.0f);
+                //heightMap[i,j] = Mathf.Clamp(Noise(i * .3f, j * .3f), 0.0f, 1.0f);
+
+                float xCoord = (float)i / _mapSize * scale + offset.x;
+                float yCoord = (float)j / _mapSize * scale + offset.y;
+
+                heightMap[i,j] = Noise(xCoord, yCoord) * maxHeight;
             }
         }
 

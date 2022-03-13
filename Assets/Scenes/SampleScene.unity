@@ -208,7 +208,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1180547562}
         m_TargetAssemblyTypeName: TerrainGenerator, Assembly-CSharp
-        m_MethodName: GenerateMesh
+        m_MethodName: GenerateTerrain
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -291,8 +291,8 @@ MonoBehaviour:
   _mapSize: 0
   _seed: 926
   _scale: 1
-  offset: {x: 0, y: 0}
-  _terrainObject: {fileID: 1074495206}
+  _offset: {x: -1, y: -1}
+  _terrain: {fileID: 0}
 --- !u!4 &390941175
 Transform:
   m_ObjectHideFlags: 0
@@ -634,8 +634,8 @@ MonoBehaviour:
   _mapSize: 0
   _seed: 92621
   _scale: 1
-  offset: {x: 0, y: 0}
-  _terrainObject: {fileID: 1074495206}
+  _offset: {x: -1, y: -1}
+  _terrain: {fileID: 0}
 --- !u!1 &1180547560
 GameObject:
   m_ObjectHideFlags: 0
@@ -650,6 +650,7 @@ GameObject:
   - component: {fileID: 1180547563}
   - component: {fileID: 1180547562}
   - component: {fileID: 1180547561}
+  - component: {fileID: 1180547567}
   m_Layer: 0
   m_Name: Terrain
   m_TagString: Untagged
@@ -684,11 +685,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _maxHeight: 20
-  _mapSize: 256
+  _mapSize: 512
   _seed: 92621
   _scale: 20
-  offset: {x: 0, y: 0}
-  _terrainObject: {fileID: 1180547560}
+  _offset: {x: 0, y: 0}
+  _terrain: {fileID: 0}
 --- !u!65 &1180547563
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -766,6 +767,40 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!218 &1180547567
+Terrain:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1180547560}
+  m_Enabled: 1
+  serializedVersion: 6
+  m_TerrainData: {fileID: 0}
+  m_TreeDistance: 5000
+  m_TreeBillboardDistance: 50
+  m_TreeCrossFadeLength: 5
+  m_TreeMaximumFullLODCount: 50
+  m_DetailObjectDistance: 80
+  m_DetailObjectDensity: 1
+  m_HeightmapPixelError: 5
+  m_SplatMapDistance: 1000
+  m_HeightmapMaximumLOD: 0
+  m_ShadowCastingMode: 2
+  m_DrawHeightmap: 1
+  m_DrawInstanced: 0
+  m_DrawTreesAndFoliage: 1
+  m_StaticShadowCaster: 0
+  m_ReflectionProbeUsage: 1
+  m_MaterialTemplate: {fileID: 0}
+  m_BakeLightProbesForTrees: 1
+  m_PreserveTreePrototypeLayers: 0
+  m_DeringLightProbesForTrees: 1
+  m_ScaleInLightmap: 1
+  m_LightmapParameters: {fileID: 15203, guid: 0000000000000000f000000000000000, type: 0}
+  m_GroupingID: 0
+  m_RenderingLayerMask: 1
+  m_AllowAutoConnect: 0
 --- !u!1 &1353894750
 GameObject:
   m_ObjectHideFlags: 0
