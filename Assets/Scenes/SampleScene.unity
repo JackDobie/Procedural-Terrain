@@ -208,7 +208,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1180547562}
         m_TargetAssemblyTypeName: TerrainGenerator, Assembly-CSharp
-        m_MethodName: GenerateTerrain
+        m_MethodName: GenerateMesh
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -291,7 +291,7 @@ MonoBehaviour:
   _mapSize: 0
   _seed: 926
   _scale: 1
-  _offset: {x: -1, y: -1}
+  _offset: {x: 0, y: 0}
   _terrain: {fileID: 0}
 --- !u!4 &390941175
 Transform:
@@ -634,7 +634,7 @@ MonoBehaviour:
   _mapSize: 0
   _seed: 92621
   _scale: 1
-  _offset: {x: -1, y: -1}
+  _offset: {x: 0, y: 0}
   _terrain: {fileID: 0}
 --- !u!1 &1180547560
 GameObject:

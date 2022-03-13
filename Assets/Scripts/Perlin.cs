@@ -23,7 +23,7 @@ public class Perlin : MonoBehaviour
         _gradients = GenerateGridGradients();
     }
 
-    public float[,] GenerateHeightMap(float scale, int maxHeight, Vector2 offset)
+    public float[,] GenerateHeightMap(float scale, float maxHeight, Vector2 offset)
     {
         _gradients = GenerateGridGradients();
         float[,] heightMap = new float[_mapSize, _mapSize];
