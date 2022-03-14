@@ -62,7 +62,7 @@ public class TerrainGenerator : MonoBehaviour
         TerrainData t = new TerrainData();
         t.heightmapResolution = _mapSize;
         t.size = new Vector3(_mapSize + 1, _maxHeight, _mapSize + 1);
-        t.SetHeights(0, 0, heightMap);
+        t.SetHeights(0, 0, _heightMap);
         _terrain.terrainData = t;
     }
 
@@ -75,7 +75,7 @@ public class TerrainGenerator : MonoBehaviour
             for(int j = 0; j < _mapSize; j++)
             {
                 // add a new vertex using the heightmap data for Y
-                verts.Add(new Vector3(i, heightMap[i, j], j));
+                verts.Add(new Vector3(i, _heightMap[i, j], j));
 
                 if (i == 0 || j == 0) continue;
 
