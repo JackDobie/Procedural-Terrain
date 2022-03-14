@@ -1,21 +1,22 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Perlin))]
+[RequireComponent(typeof(Perlin), typeof(DiamondSquare))]
 [RequireComponent(typeof(MeshFilter))]
 public class TerrainGenerator : MonoBehaviour
 {
-    [SerializeField] float _maxHeight;
-    [SerializeField] int _mapSize;
-    [SerializeField] int _seed;
-    [SerializeField] /*[Range(0.0f, 1.0f)]*/ float _scale;
-    [SerializeField] Vector2 _offset;
-    Perlin _perlin;
+    [SerializeField] private float _maxHeight;
+    [SerializeField] private int _mapSize;
+    [SerializeField] private int _seed;
+    [SerializeField] private float _scale;
+    [SerializeField] private Vector2 _offset;
+    public int _activeNoise;
+    private Perlin _perlin;
+    private DiamondSquare _diamondSquare;
     //[SerializeField] GameObject _terrainObject; 
-    Mesh _mesh;
+    private Mesh _mesh;
     public Terrain _terrain;
+    private float[,] _heightMap;
 
     private void OnValidate()
     {
@@ -24,36 +25,49 @@ public class TerrainGenerator : MonoBehaviour
         _offset.y = Mathf.Clamp(_offset.y, 0, _mapSize - 1);
     }
 
-    void Awake()
+    private void Awake()
     {
         _perlin = gameObject.GetComponent<Perlin>();
+        _diamondSquare = gameObject.GetComponent<DiamondSquare>();
         _mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = _mesh;
         _terrain = GetComponent<Terrain>();
     }
 
-    void Start()
+    private void Start()
     {
+        // initialise noise and generate height map
+        switch (_activeNoise)
+        {
+            case 0:
+                _perlin.Init(_seed, _mapSize);
+                _heightMap = _perlin.GenerateHeightMap(_scale, _maxHeight, _offset);
+                break;
+            case 1:
+                _diamondSquare.Init(_seed, _mapSize);
+                _heightMap = _diamondSquare.GenerateHeightMap(_scale, _maxHeight, _offset);
+                break;
+            default: // use perlin as default
+                _perlin.Init(_seed, _mapSize);
+                _heightMap = _perlin.GenerateHeightMap(_scale, _maxHeight, _offset);
+                break;
+        }
+        
         GenerateMesh();
         //GenerateTerrain();
     }
 
     public void GenerateTerrain()
     {
-        _perlin.Init(_seed, _mapSize);
-        float[,] _heightMap = _perlin.GenerateHeightMap(_scale, _mapSize, _offset);
         TerrainData t = new TerrainData();
         t.heightmapResolution = _mapSize;
         t.size = new Vector3(_mapSize + 1, _maxHeight, _mapSize + 1);
-        t.SetHeights(0, 0, _heightMap);
+        t.SetHeights(0, 0, heightMap);
         _terrain.terrainData = t;
     }
 
     public void GenerateMesh()
     {
-        // generate height map
-        _perlin.Init(_seed, _mapSize);
-        float[,] _heightMap = _perlin.GenerateHeightMap(_scale, _maxHeight, _offset);
         List<Vector3> verts = new List<Vector3>();
         List<int> tris = new List<int>();
         for(int i = 0; i < _mapSize; i++)
@@ -61,7 +75,7 @@ public class TerrainGenerator : MonoBehaviour
             for(int j = 0; j < _mapSize; j++)
             {
                 // add a new vertex using the heightmap data for Y
-                verts.Add(new Vector3(i, _heightMap[i, j], j));
+                verts.Add(new Vector3(i, heightMap[i, j], j));
 
                 if (i == 0 || j == 0) continue;
 
