@@ -36,20 +36,24 @@ public class TerrainGenerator : MonoBehaviour
 
     private void Start()
     {
+        Generate();
+    }
+
+    public void Generate()
+    {
         // initialise noise and generate height map
         switch (_activeNoise)
         {
             case 0:
                 _perlin.Init(_seed, _mapSize);
-                _heightMap = _perlin.GenerateHeightMap(_scale, _maxHeight, _offset);
+                _heightMap = _perlin.GenerateHeightMap(_scale, _offset);
                 break;
             case 1:
-                _diamondSquare.Init(_seed, _mapSize);
-                _heightMap = _diamondSquare.GenerateHeightMap(_scale, _maxHeight, _offset);
+                _heightMap = _diamondSquare.GenerateHeightMap(_seed, _mapSize, _scale, _offset, 0.5f);
                 break;
             default: // use perlin as default
                 _perlin.Init(_seed, _mapSize);
-                _heightMap = _perlin.GenerateHeightMap(_scale, _maxHeight, _offset);
+                _heightMap = _perlin.GenerateHeightMap(_scale, _offset);
                 break;
         }
         
@@ -57,16 +61,18 @@ public class TerrainGenerator : MonoBehaviour
         //GenerateTerrain();
     }
 
-    public void GenerateTerrain()
+    private void GenerateTerrain()
     {
-        TerrainData t = new TerrainData();
-        t.heightmapResolution = _mapSize;
-        t.size = new Vector3(_mapSize + 1, _maxHeight, _mapSize + 1);
+        TerrainData t = new TerrainData
+        {
+            heightmapResolution = _mapSize,
+            size = new Vector3(_mapSize + 1, _maxHeight, _mapSize + 1),
+        };
         t.SetHeights(0, 0, _heightMap);
         _terrain.terrainData = t;
     }
 
-    public void GenerateMesh()
+    private void GenerateMesh()
     {
         List<Vector3> verts = new List<Vector3>();
         List<int> tris = new List<int>();
@@ -75,7 +81,7 @@ public class TerrainGenerator : MonoBehaviour
             for(int j = 0; j < _mapSize; j++)
             {
                 // add a new vertex using the heightmap data for Y
-                verts.Add(new Vector3(i, _heightMap[i, j], j));
+                verts.Add(new Vector3(i, _heightMap[i, j] * _maxHeight, j));
 
                 if (i == 0 || j == 0) continue;
 

@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class Perlin : MonoBehaviour
@@ -15,10 +14,11 @@ public class Perlin : MonoBehaviour
         _gradients = GenerateGridGradients(seed);
     }
 
-    public float[,] GenerateHeightMap(float scale, float maxHeight, Vector2 offset)
+    public float[,] GenerateHeightMap(float scale, Vector2 offset)
     {
         float[,] heightMap = new float[_mapSize, _mapSize];
-
+        
+        //todo: add octaves
         for (int i = 0; i < _mapSize; i++)
         {
             for(int j = 0; j < _mapSize; j++)
@@ -26,23 +26,23 @@ public class Perlin : MonoBehaviour
                 float xCoord = (float)i / _mapSize * scale + offset.x;
                 float yCoord = (float)j / _mapSize * scale + offset.y;
 
-                heightMap[i,j] = Noise(xCoord, yCoord) * maxHeight;
+                heightMap[i,j] = Noise(xCoord, yCoord);
             }
         }
 
         return heightMap;
     }
 
-    Vector2[,] GenerateGridGradients(int seed)
+    private Vector2[,] GenerateGridGradients(int seed)
     {
-        System.Random rand = new System.Random(seed);
+        Random.InitState(seed);
         _gradients = new Vector2[_mapSize, _mapSize];
         for (int i = 0; i < _mapSize; i++)
         {
             for (int j = 0; j < _mapSize; j++)
             {
-                float x = (float)rand.NextDouble();
-                float y = (float)rand.NextDouble();
+                float x = Random.value;
+                float y = Random.value;
                 _gradients[i, j] = new Vector2(x, y);
             }
         }
@@ -72,7 +72,7 @@ public class Perlin : MonoBehaviour
         return result;
 	}
 
-    float DotGridGradient(int ix, int iy, float x, float y)
+    private float DotGridGradient(int ix, int iy, float x, float y)
     {
         // get gradient from integer coordinates
         Vector2 gradient = _gradients[ix, iy];

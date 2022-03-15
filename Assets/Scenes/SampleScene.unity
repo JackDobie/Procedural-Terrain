@@ -208,7 +208,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1180547562}
         m_TargetAssemblyTypeName: TerrainGenerator, Assembly-CSharp
-        m_MethodName: GenerateMesh
+        m_MethodName: Generate
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -480,12 +480,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ba47451250a3944e9dc04810c5d8da8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxHeight: 20
-  _mapSize: 250
+  _maxHeight: 50
+  _mapSize: 248
   _seed: 92621
-  _scale: 20
+  _scale: 10
   _offset: {x: 0, y: 0}
-  _activeNoise: 0
+  _activeNoise: 1
   _terrain: {fileID: 0}
 --- !u!65 &1180547563
 BoxCollider:
