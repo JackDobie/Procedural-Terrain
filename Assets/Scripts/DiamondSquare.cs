@@ -27,9 +27,9 @@ public class DiamondSquare : MonoBehaviour
             int halfSide = sideLength / 2;
             
             // diamond step
-            for (int i = 0; i + sideLength < size - 1; i += sideLength)
+            for (int i = 0; i + sideLength < size; i += sideLength)
             {
-                for (int j = 0; j + sideLength < size - 1; j += sideLength)
+                for (int j = 0; j + sideLength < size; j += sideLength)
                 {
                     // finds the average of the corners
                     float average = values[i, j]; // TL
@@ -48,14 +48,14 @@ public class DiamondSquare : MonoBehaviour
             }
             
             // square step
-            for (int i = 0; i < size - 1; i += halfSide)
+            for (int i = 0; i < size; i += halfSide)
             {
-                for (int j = (i + halfSide) % sideLength; j < size - 1; j += sideLength)
+                for (int j = (i + halfSide) % sideLength; j < size; j += sideLength)
                 {
-                    float average = values[(i - halfSide + size - 1) % (size - 1), j];
-                    average += values[(i + halfSide) % (size - 1), j];
-                    average += values[i, (j + halfSide) % (size - 1)];
-                    average += values[i, (j - halfSide + size - 1) % (size - 1)];
+                    float average = values[(i - halfSide + size - 1) % (size), j];
+                    average += values[(i + halfSide) % (size), j];
+                    average += values[i, (j + halfSide) % (size)];
+                    average += values[i, (j - halfSide + size - 1) % (size)];
                     average *= 0.25f;
                     
                     //add random offset

@@ -15,8 +15,9 @@ public class TerrainGenerator : MonoBehaviour
     private DiamondSquare _diamondSquare;
     //[SerializeField] GameObject _terrainObject; 
     private Mesh _mesh;
-    public Terrain _terrain;
+    private Terrain _terrain;
     private float[,] _heightMap;
+    [SerializeField] private Material _terrainMat;
 
     private void OnValidate()
     {
@@ -57,22 +58,32 @@ public class TerrainGenerator : MonoBehaviour
                 break;
         }
         
-        GenerateMesh();
-        //GenerateTerrain();
+        float[,] scaledHeights = new float[_mapSize, _mapSize];
+        for (int i = 0; i < _mapSize; i++)
+        {
+            for (int j = 0; j < _mapSize; j++)
+            {
+                scaledHeights[i, j] = _heightMap[(int)(i / (float)_mapSize * _scale), (int)(j / (float)_mapSize * _scale)];
+            }
+        }
+        
+        //GenerateMesh(scaledHeights);
+        GenerateTerrain(scaledHeights);
     }
 
-    private void GenerateTerrain()
+    private void GenerateTerrain(float[,] map)
     {
         TerrainData t = new TerrainData
         {
             heightmapResolution = _mapSize,
-            size = new Vector3(_mapSize + 1, _maxHeight, _mapSize + 1),
+            size = new Vector3(_mapSize, _maxHeight, _mapSize),
         };
-        t.SetHeights(0, 0, _heightMap);
+        t.SetHeights(0, 0, map);
         _terrain.terrainData = t;
+        _terrain.materialTemplate = _terrainMat;
     }
 
-    private void GenerateMesh()
+    private void GenerateMesh(float[,] map)
     {
         List<Vector3> verts = new List<Vector3>();
         List<int> tris = new List<int>();
@@ -81,7 +92,7 @@ public class TerrainGenerator : MonoBehaviour
             for(int j = 0; j < _mapSize; j++)
             {
                 // add a new vertex using the heightmap data for Y
-                verts.Add(new Vector3(i, _heightMap[i, j] * _maxHeight, j));
+                verts.Add(new Vector3(i, map[i, j] * _maxHeight, j));
 
                 if (i == 0 || j == 0) continue;
 
