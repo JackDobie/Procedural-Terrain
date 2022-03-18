@@ -18,6 +18,7 @@ public class TerrainGenerator : MonoBehaviour
     private Terrain _terrain;
     private float[,] _heightMap;
     [SerializeField] private Material _terrainMat;
+    [SerializeField] private bool _useTerrain;
 
     private void OnValidate()
     {
@@ -67,8 +68,10 @@ public class TerrainGenerator : MonoBehaviour
         //     }
         // }
         
-        //GenerateMesh(_heightMap);
-        GenerateTerrain(_heightMap);
+        if(_useTerrain)
+            GenerateTerrain(_heightMap);
+        else
+            GenerateMesh(_heightMap);
     }
 
     private void GenerateTerrain(float[,] map)
