@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,10 +8,11 @@ public class TerrainGenerator : MonoBehaviour
 {
     [Header("Noise properties")]
     [SerializeField] private int _seed;
-    /// <summary> if generating mesh, limit this to 254 because meshes are limited to 65000 verts</summary>
+    /// <summary> if generating mesh, limit this to 254 because meshes are limited to 65000 verts
+    /// </summary>
     [SerializeField] private int _mapSize;
+    private int oldSize = 128;
     [SerializeField] private float _maxHeight;
-    [SerializeField] private Vector2 _offset;
     [Space] public int _activeNoise;
     private Perlin _perlin;
     private DiamondSquare _diamondSquare;
@@ -22,16 +24,29 @@ public class TerrainGenerator : MonoBehaviour
 
     private void OnValidate()
     {
-        // ensure that offset is in range
-        _offset.x = Mathf.Clamp(_offset.x, 0, _mapSize - 1);
-        _offset.y = Mathf.Clamp(_offset.y, 0, _mapSize - 1);
+        // if mapsize changed
+        if (oldSize != _mapSize)
+        {
+            // check if mapsize is power of 2
+            if ((_mapSize & (_mapSize - 1)) == 0)
+            {
+                oldSize = _mapSize;
+            }
+            else
+            {
+                _mapSize = oldSize;
+            }
+        }
     }
 
     private void Awake()
     {
         _perlin = gameObject.GetComponent<Perlin>();
         _diamondSquare = gameObject.GetComponent<DiamondSquare>();
-        _mesh = new Mesh();
+        _mesh = new Mesh
+        {
+            indexFormat = UnityEngine.Rendering.IndexFormat.UInt16
+        };
         GetComponent<MeshFilter>().mesh = _mesh;
         _terrain = GetComponent<Terrain>();
     }
@@ -48,14 +63,14 @@ public class TerrainGenerator : MonoBehaviour
         {
             case 0:
                 _perlin.Init(_seed, _mapSize);
-                _heightMap = _perlin.GenerateHeightMap(_offset);
+                _heightMap = _perlin.GenerateHeightMap();
                 break;
             case 1:
                 _heightMap = _diamondSquare.GenerateHeightMap(_seed, _mapSize);
                 break;
             default: // use perlin as default
                 _perlin.Init(_seed, _mapSize);
-                _heightMap = _perlin.GenerateHeightMap(_offset);
+                _heightMap = _perlin.GenerateHeightMap();
                 break;
         }
         
@@ -83,10 +98,11 @@ public class TerrainGenerator : MonoBehaviour
 
     private void GenerateTerrain(float[,] map)
     {
+        int size = (int)Mathf.Sqrt(map.Length);
         TerrainData t = new TerrainData
         {
-            heightmapResolution = _mapSize,
-            size = new Vector3(_mapSize, _maxHeight, _mapSize),
+            heightmapResolution = size,
+            size = new Vector3(size, _maxHeight, size),
         };
         t.SetHeights(0, 0, map);
         _terrain.terrainData = t;
@@ -95,11 +111,12 @@ public class TerrainGenerator : MonoBehaviour
 
     private void GenerateMesh(float[,] map)
     {
+        int size = (int)Mathf.Sqrt(map.Length);
         List<Vector3> verts = new List<Vector3>();
         List<int> tris = new List<int>();
-        for(int i = 0; i < _mapSize; i++)
+        for(int i = 0; i < size; i++)
         {
-            for(int j = 0; j < _mapSize; j++)
+            for(int j = 0; j < size; j++)
             {
                 // add a new vertex using the heightmap data for Y
                 verts.Add(new Vector3(i, map[i, j] * _maxHeight, j));
@@ -107,12 +124,12 @@ public class TerrainGenerator : MonoBehaviour
                 if (i == 0 || j == 0) continue;
 
                 // adds the indexes of three verts in order to make up each of two triangles
-                tris.Add(_mapSize * i + j); // TR
-                tris.Add(_mapSize * i + j - 1); // BR
-                tris.Add(_mapSize * (i - 1) + j - 1); // BL
-                tris.Add(_mapSize * (i - 1) + j - 1); // BL
-                tris.Add(_mapSize * (i - 1) + j); // TL
-                tris.Add(_mapSize * i + j); // TR
+                tris.Add(size * i + j); // TR
+                tris.Add(size * i + j - 1); // BR
+                tris.Add(size * (i - 1) + j - 1); // BL
+                tris.Add(size * (i - 1) + j - 1); // BL
+                tris.Add(size * (i - 1) + j); // TL
+                tris.Add(size * i + j); // TR
             }
         }
 
@@ -125,5 +142,10 @@ public class TerrainGenerator : MonoBehaviour
         // generate heightmap
         // apply erosion
         // create mesh using heightmap
+    }
+
+    private void Update()
+    {
+        
     }
 }

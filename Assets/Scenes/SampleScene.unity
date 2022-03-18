@@ -469,6 +469,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _octaves: 1
   _persistence: 0.25
+  _offset: {x: 0, y: 0}
+  _scale: 20
 --- !u!114 &1180547562
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -481,14 +483,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ba47451250a3944e9dc04810c5d8da8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxHeight: 50
-  _mapSize: 128
   _seed: 92621
-  _scale: 20
-  _offset: {x: 0, y: 0}
+  _mapSize: 128
+  _maxHeight: 100
   _activeNoise: 1
-  _terrainMat: {fileID: 2100000, guid: 6eb12f94163d54e458ce7ae26739ca6f, type: 2}
   _useTerrain: 0
+  _terrainMat: {fileID: 2100000, guid: 6eb12f94163d54e458ce7ae26739ca6f, type: 2}
 --- !u!65 &1180547563
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -578,8 +578,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9bf180d294cbfa43a8f54673b0a76e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _offsetRange: 2
-  _smoothness: 2
+  _offsetRange: 1
+  _smoothness: 1
 --- !u!218 &1180547568
 Terrain:
   m_ObjectHideFlags: 0

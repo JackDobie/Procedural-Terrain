@@ -2,20 +2,29 @@ using UnityEngine;
 
 public class Perlin : MonoBehaviour
 {
-    private int _mapSize;
+    private int _mapSize = 0;
     [SerializeField] private int _octaves;
     [SerializeField] private float _persistence;
+    [SerializeField] private Vector2 _offset;
     public float _scale;
 
     private Vector2[,] _gradients;
-
+    
+    private void OnValidate()
+    {
+        float maxSize = _mapSize > 0 ? (_mapSize - _scale - 1) : 0;
+        // clamp offset to 0 and map size
+        _offset.x = Mathf.Clamp(_offset.x, 0, maxSize);
+        _offset.y = Mathf.Clamp(_offset.y, 0, maxSize);
+    }
+    
     public void Init(int seed, int mapSize)
     {
         _mapSize = mapSize;
         _gradients = GenerateGridGradients(seed);
     }
 
-    public float[,] GenerateHeightMap(Vector2 offset)
+    public float[,] GenerateHeightMap()
     {
         float[,] heightMap = new float[_mapSize, _mapSize];
         
@@ -24,8 +33,8 @@ public class Perlin : MonoBehaviour
         {
             for(int j = 0; j < _mapSize; j++)
             {
-                float xCoord = (float)i / _mapSize * _scale + offset.x;
-                float yCoord = (float)j / _mapSize * _scale + offset.y;
+                float xCoord = (float)i / _mapSize * _scale + _offset.x;
+                float yCoord = (float)j / _mapSize * _scale + _offset.y;
 
                 heightMap[i,j] = Noise(xCoord, yCoord);
             }
