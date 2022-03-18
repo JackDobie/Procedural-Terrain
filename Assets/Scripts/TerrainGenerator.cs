@@ -50,7 +50,7 @@ public class TerrainGenerator : MonoBehaviour
                 _heightMap = _perlin.GenerateHeightMap(_scale, _offset);
                 break;
             case 1:
-                _heightMap = _diamondSquare.GenerateHeightMap(_seed, _mapSize, _scale, _offset, 0.5f);
+                _heightMap = _diamondSquare.GenerateHeightMap(_seed, _mapSize, _scale, _offset);
                 break;
             default: // use perlin as default
                 _perlin.Init(_seed, _mapSize);
@@ -58,17 +58,17 @@ public class TerrainGenerator : MonoBehaviour
                 break;
         }
         
-        float[,] scaledHeights = new float[_mapSize, _mapSize];
-        for (int i = 0; i < _mapSize; i++)
-        {
-            for (int j = 0; j < _mapSize; j++)
-            {
-                scaledHeights[i, j] = _heightMap[(int)(i / (float)_mapSize * _scale), (int)(j / (float)_mapSize * _scale)];
-            }
-        }
+        // float[,] scaledHeights = new float[_mapSize, _mapSize];
+        // for (int i = 0; i < _mapSize; i++)
+        // {
+        //     for (int j = 0; j < _mapSize; j++)
+        //     {
+        //         scaledHeights[i, j] = _heightMap[(int)(i / (float)_mapSize * _scale), (int)(j / (float)_mapSize * _scale)];
+        //     }
+        // }
         
-        //GenerateMesh(scaledHeights);
-        GenerateTerrain(scaledHeights);
+        //GenerateMesh(_heightMap);
+        GenerateTerrain(_heightMap);
     }
 
     private void GenerateTerrain(float[,] map)

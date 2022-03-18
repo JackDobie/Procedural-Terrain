@@ -1,10 +1,12 @@
-using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 public class DiamondSquare : MonoBehaviour
 {
-    public float[,] GenerateHeightMap(int seed, int size, float scale, Vector2 offset, float randRange)
+    public float _offsetRange;
+    
+    public float[,] GenerateHeightMap(int seed, int size, float scale, Vector2 offset)
     {
         Random.InitState(seed);
         
@@ -39,7 +41,7 @@ public class DiamondSquare : MonoBehaviour
                     average *= 0.25f; // divide by 4
                     
                     // add a random offset to the centre of the points
-                    average += Random.Range(0, randRange);
+                    average += Random.Range(0, _offsetRange);
 
                     //average = Mathf.Clamp(average, 0.0f, 1.0f);
                     
@@ -59,13 +61,22 @@ public class DiamondSquare : MonoBehaviour
                     average *= 0.25f;
                     
                     //add random offset
-                    average += Random.Range(0, randRange);
+                    average += Random.Range(0, _offsetRange);
 
                     //average = Mathf.Clamp(average, 0.0f, 1.0f);
                     
                     values[i, j] = average;
                     
                     //todo: add edge case
+                    if (i == 0)
+                    {
+                        values[size - 1, j] = average;
+                    }
+
+                    if (j == 0)
+                    {
+                        values[i, size - 1] = average;
+                    }
                 }
             }
             // half the random range

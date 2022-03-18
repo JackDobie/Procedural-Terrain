@@ -481,10 +481,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ba47451250a3944e9dc04810c5d8da8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxHeight: 10
+  _maxHeight: 20
   _mapSize: 512
   _seed: 92621
-  _scale: 10
+  _scale: 20
   _offset: {x: 0, y: 0}
   _activeNoise: 0
   _terrainMat: {fileID: 2100000, guid: 6eb12f94163d54e458ce7ae26739ca6f, type: 2}
@@ -577,6 +577,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9bf180d294cbfa43a8f54673b0a76e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _offsetRange: 10
 --- !u!218 &1180547568
 Terrain:
   m_ObjectHideFlags: 0

@@ -26,7 +26,7 @@ public class Perlin : MonoBehaviour
                 float xCoord = (float)i / _mapSize * scale + offset.x;
                 float yCoord = (float)j / _mapSize * scale + offset.y;
 
-                heightMap[i,j] = Noise(i, j);
+                heightMap[i,j] = Noise(xCoord, yCoord);
             }
         }
 
