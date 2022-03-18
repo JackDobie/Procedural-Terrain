@@ -6,7 +6,7 @@ public class DiamondSquare : MonoBehaviour
     public float _offsetRange;
     public float _smoothness;
     
-    public float[,] GenerateHeightMap(int seed, int size, float scale, Vector2 offset)
+    public float[,] GenerateHeightMap(int seed, int size)
     {
         // check that the size is a power of 2
         if ((size & (size - 1)) != 0)
@@ -20,11 +20,11 @@ public class DiamondSquare : MonoBehaviour
         Random.InitState(seed);
         
         //todo: create island option by setting these to min height
-        float[,] heightMap = new float[size, size];
-        heightMap[0, 0] = Random.Range(0.0f, 1.0f); // top left
-        heightMap[0, size - 1] = Random.Range(0.0f, 1.0f); // top right
-        heightMap[size - 1, 0] = Random.Range(0.0f, 1.0f); // bottom left
-        heightMap[size - 1, size - 1] = Random.Range(0.0f, 1.0f); // bottom right
+        float[,] heightMap = new float[size + 1, size + 1];
+        heightMap[0, 0] = Random.Range(-range, range); // top left
+        heightMap[0, size] = Random.Range(-range, range); // top right
+        heightMap[size, 0] = Random.Range(-range, range); // bottom left
+        heightMap[size, size] = Random.Range(-range, range); // bottom right
         
         // half sidelength while the length of the side is greater than 1
         for (int sideLength = size; sideLength > 1; sideLength /= 2)
@@ -38,15 +38,14 @@ public class DiamondSquare : MonoBehaviour
                 {
                     // finds the average of the corners
                     float average = heightMap[x, y]; // TL
-                    average += heightMap[x + sideLength - 1, y]; // TR
-                    average += heightMap[x, y + sideLength - 1]; // BL
-                    average += heightMap[x + sideLength - 1, y + sideLength - 1]; // BR
+                    average += heightMap[x + sideLength, y]; // TR
+                    average += heightMap[x, y + sideLength]; // BL
+                    average += heightMap[x + sideLength, y + sideLength]; // BR
                     average *= 0.25f; // divide by 4
                     
                     // add a random offset to the centre of the points
                     average += Random.Range(0, range);
-
-                    //average = Mathf.Clamp(average, 0.0f, 1.0f);
+                    //average = Mathf.Clamp01(average);
                     
                     heightMap[x + halfSide, y + halfSide] = average;
                 }
@@ -65,8 +64,7 @@ public class DiamondSquare : MonoBehaviour
                     
                     //add random offset
                     average += Random.Range(0, range);
-
-                    //average = Mathf.Clamp(average, 0.0f, 1.0f);
+                    //average = Mathf.Clamp01(average);
                     
                     heightMap[x, y] = average;
                     

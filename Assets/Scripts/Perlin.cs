@@ -5,6 +5,7 @@ public class Perlin : MonoBehaviour
     private int _mapSize;
     [SerializeField] private int _octaves;
     [SerializeField] private float _persistence;
+    public float _scale;
 
     private Vector2[,] _gradients;
 
@@ -14,7 +15,7 @@ public class Perlin : MonoBehaviour
         _gradients = GenerateGridGradients(seed);
     }
 
-    public float[,] GenerateHeightMap(float scale, Vector2 offset)
+    public float[,] GenerateHeightMap(Vector2 offset)
     {
         float[,] heightMap = new float[_mapSize, _mapSize];
         
@@ -23,8 +24,8 @@ public class Perlin : MonoBehaviour
         {
             for(int j = 0; j < _mapSize; j++)
             {
-                float xCoord = (float)i / _mapSize * scale + offset.x;
-                float yCoord = (float)j / _mapSize * scale + offset.y;
+                float xCoord = (float)i / _mapSize * _scale + offset.x;
+                float yCoord = (float)j / _mapSize * _scale + offset.y;
 
                 heightMap[i,j] = Noise(xCoord, yCoord);
             }

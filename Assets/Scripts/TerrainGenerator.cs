@@ -5,20 +5,20 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter))]
 public class TerrainGenerator : MonoBehaviour
 {
-    [SerializeField] private float _maxHeight;
-    [SerializeField] private int _mapSize;
+    [Header("Noise properties")]
     [SerializeField] private int _seed;
-    [SerializeField] private float _scale;
+    /// <summary> if generating mesh, limit this to 254 because meshes are limited to 65000 verts</summary>
+    [SerializeField] private int _mapSize;
+    [SerializeField] private float _maxHeight;
     [SerializeField] private Vector2 _offset;
-    public int _activeNoise;
+    [Space] public int _activeNoise;
     private Perlin _perlin;
     private DiamondSquare _diamondSquare;
-    //[SerializeField] GameObject _terrainObject; 
     private Mesh _mesh;
     private Terrain _terrain;
     private float[,] _heightMap;
+    [Space] [SerializeField] private bool _useTerrain;
     [SerializeField] private Material _terrainMat;
-    [SerializeField] private bool _useTerrain;
 
     private void OnValidate()
     {
@@ -48,14 +48,14 @@ public class TerrainGenerator : MonoBehaviour
         {
             case 0:
                 _perlin.Init(_seed, _mapSize);
-                _heightMap = _perlin.GenerateHeightMap(_scale, _offset);
+                _heightMap = _perlin.GenerateHeightMap(_offset);
                 break;
             case 1:
-                _heightMap = _diamondSquare.GenerateHeightMap(_seed, _mapSize, _scale, _offset);
+                _heightMap = _diamondSquare.GenerateHeightMap(_seed, _mapSize);
                 break;
             default: // use perlin as default
                 _perlin.Init(_seed, _mapSize);
-                _heightMap = _perlin.GenerateHeightMap(_scale, _offset);
+                _heightMap = _perlin.GenerateHeightMap(_offset);
                 break;
         }
         
@@ -67,11 +67,18 @@ public class TerrainGenerator : MonoBehaviour
         //         scaledHeights[i, j] = _heightMap[(int)(i / (float)_mapSize * _scale), (int)(j / (float)_mapSize * _scale)];
         //     }
         // }
-        
-        if(_useTerrain)
-            GenerateTerrain(_heightMap);
+
+        if (_useTerrain)
+        {
+            _mesh.Clear();
+            _terrain.enabled = true;
+            GenerateTerrain(_heightMap);   
+        }
         else
+        {
+            _terrain.enabled = false;
             GenerateMesh(_heightMap);
+        }
     }
 
     private void GenerateTerrain(float[,] map)

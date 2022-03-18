@@ -488,7 +488,7 @@ MonoBehaviour:
   _offset: {x: 0, y: 0}
   _activeNoise: 1
   _terrainMat: {fileID: 2100000, guid: 6eb12f94163d54e458ce7ae26739ca6f, type: 2}
-  _useTerrain: 1
+  _useTerrain: 0
 --- !u!65 &1180547563
 BoxCollider:
   m_ObjectHideFlags: 0
