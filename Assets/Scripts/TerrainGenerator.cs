@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using MyBox;
+using TMPro;
 using UnityEngine;
 
 [RequireComponent(typeof(Perlin), typeof(DiamondSquare))]
@@ -8,10 +10,10 @@ public class TerrainGenerator : MonoBehaviour
 {
     [SerializeField] private Transform _pivotPoint;
     [Header("Noise properties")]
-    [SerializeField] private int _seed;
-    [SerializeField] private int _mapSize;
+    public int _seed;
+    public int _mapSize;
     private int oldSize = 128;
-    [SerializeField] private float _maxHeight;
+    public float _maxHeight;
     
     [Space] public NoiseType _activeNoise;
     private Perlin _perlin;
@@ -27,10 +29,10 @@ public class TerrainGenerator : MonoBehaviour
     [ConditionalField(nameof(_rotate))]
     [SerializeField] private float _rotateSpeed;
 
-    public enum NoiseType
+    public enum NoiseType : int
     {
-        Perlin,
-        DiamondSquare
+        Perlin = 0,
+        DiamondSquare = 1
     }
 
     private void OnValidate()
@@ -109,7 +111,8 @@ public class TerrainGenerator : MonoBehaviour
         }
         
         // reset rotation
-        transform.rotation = Quaternion.identity;
+        transform.position = _pivotPoint.transform.position;
+        _pivotPoint.rotation = Quaternion.identity;
         if(_rotate)
         {
             // subtract position by half mapsize to make it rotate around the centre

@@ -1,9 +1,11 @@
+using MyBox;
 using UnityEngine;
 
 public class Perlin : MonoBehaviour
 {
     private int _mapSize = 0;
     [SerializeField] private int _octaves;
+    [ConditionalField(nameof(_octaves), true, 0)]
     [SerializeField] private float _persistence;
     [Space] [SerializeField] private Vector2 _offset;
     [SerializeField] private float _scale;
@@ -35,8 +37,15 @@ public class Perlin : MonoBehaviour
             {
                 float xCoord = (float)i / _mapSize * _scale + _offset.x;
                 float yCoord = (float)j / _mapSize * _scale + _offset.y;
-
-                heightMap[i,j] = Noise(xCoord, yCoord);
+                
+                if(_octaves > 0)
+                {
+                    heightMap[i, j] = OctaveNoise(xCoord, yCoord);
+                }
+                else
+                {
+                    heightMap[i, j] = Noise(xCoord, yCoord);
+                }
             }
         }
 
@@ -81,6 +90,24 @@ public class Perlin : MonoBehaviour
 
         return result;
 	}
+
+    public float OctaveNoise(float x, float y)
+    {
+        float total = 0;
+        float frequency = 1;
+        float amplitude = 1;
+        float maxValue = 0;
+        for (int i = 0; i < _octaves; i++)
+        {
+            total += Noise(x * frequency, y * frequency) * amplitude;
+            maxValue += amplitude;
+            amplitude *= _persistence;
+            frequency *= 2;
+        }
+
+        if (maxValue == 0) return total;
+        return total / maxValue;
+    }
 
     private float DotGridGradient(int ix, int iy, float x, float y)
     {
