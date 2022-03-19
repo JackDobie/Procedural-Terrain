@@ -23,10 +23,10 @@ public class DiamondSquare : MonoBehaviour
         
         //todo: create island option by setting these to min height
         float[,] heightMap = new float[size + 1, size + 1];
-        heightMap[0, 0] = RandomRange(1.0f); // top left
-        heightMap[0, size] = RandomRange(1.0f); // top right
-        heightMap[size, 0] = RandomRange(1.0f); // bottom left
-        heightMap[size, size] = RandomRange(1.0f); // bottom right
+        heightMap[0, 0] = RandomRange(range); // top left
+        heightMap[0, size] = RandomRange(range); // top right
+        heightMap[size, 0] = RandomRange(range); // bottom left
+        heightMap[size, size] = RandomRange(range); // bottom right
         
         // half sidelength while the length of the side is greater than 1
         for (int sideLength = size; sideLength > 1; sideLength /= 2)

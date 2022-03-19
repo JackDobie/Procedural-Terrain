@@ -5,8 +5,8 @@ public class Perlin : MonoBehaviour
     private int _mapSize = 0;
     [SerializeField] private int _octaves;
     [SerializeField] private float _persistence;
-    [SerializeField] private Vector2 _offset;
-    public float _scale;
+    [Space] [SerializeField] private Vector2 _offset;
+    [SerializeField] private float _scale;
 
     private Vector2[,] _gradients;
     
