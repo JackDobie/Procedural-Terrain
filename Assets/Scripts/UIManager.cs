@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
@@ -17,6 +18,8 @@ public class UIManager : MonoBehaviour
     public TMP_InputField _perlinOffsetXField;
     public TMP_InputField _perlinOffsetYField;
     public TMP_InputField _perlinScaleField;
+    [Space]
+    public TMP_InputField _rotateSpeedField;
 
     private void Awake()
     {
@@ -30,6 +33,8 @@ public class UIManager : MonoBehaviour
         _perlinOffsetXField.text = _perlin._offset.x.ToString();
         _perlinOffsetYField.text = _perlin._offset.y.ToString();
         _perlinScaleField.text = _perlin._scale.ToString();
+
+        _rotateSpeedField.text = _terrainGenerator._rotateSpeed.ToString();
     }
 
     public void SetSeed()
@@ -131,6 +136,23 @@ public class UIManager : MonoBehaviour
         else
         {
             _perlinScaleField.text = _perlin._scale.ToString();
+        }
+    }
+
+    public void ToggleRotation()
+    {
+        _terrainGenerator._rotate = !_terrainGenerator._rotate;
+    }
+
+    public void SetRotateSpeed()
+    {
+        if(float.TryParse(_rotateSpeedField.text, out float result))
+        {
+            _terrainGenerator._rotateSpeed = result;
+        }
+        else
+        {
+            _rotateSpeedField.text = _terrainGenerator._rotateSpeed.ToString();
         }
     }
     

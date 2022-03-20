@@ -25,9 +25,9 @@ public class TerrainGenerator : MonoBehaviour
     [ConditionalField(nameof(_useTerrain))]
     [SerializeField] private Material _terrainMat;
     
-    [Space] [SerializeField] private bool _rotate;
+    [Space] public bool _rotate;
     [ConditionalField(nameof(_rotate))]
-    [SerializeField] private float _rotateSpeed;
+    public float _rotateSpeed;
 
     public enum NoiseType
     {
