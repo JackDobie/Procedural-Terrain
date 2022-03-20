@@ -4,11 +4,12 @@ using UnityEngine;
 public class Perlin : MonoBehaviour
 {
     private int _mapSize = 0;
-    [SerializeField] private int _octaves;
+    public int _octaves;
     [ConditionalField(nameof(_octaves), true, 0)]
-    [SerializeField] private float _persistence;
-    [Space] [SerializeField] private Vector2 _offset;
-    [SerializeField] private float _scale;
+    public float _persistence;
+    [Space]
+    public Vector2 _offset;
+    public float _scale;
 
     private Vector2[,] _gradients;
     

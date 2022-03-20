@@ -1,13 +1,13 @@
-using System;
 using System.Collections.Generic;
 using MyBox;
-using TMPro;
 using UnityEngine;
 
 [RequireComponent(typeof(Perlin), typeof(DiamondSquare))]
 [RequireComponent(typeof(MeshFilter))]
 public class TerrainGenerator : MonoBehaviour
 {
+    [SerializeField] private Camera _camera;
+    [Space]
     [SerializeField] private Transform _pivotPoint;
     [Header("Noise properties")]
     public int _seed;
@@ -29,7 +29,7 @@ public class TerrainGenerator : MonoBehaviour
     [ConditionalField(nameof(_rotate))]
     [SerializeField] private float _rotateSpeed;
 
-    public enum NoiseType : int
+    public enum NoiseType
     {
         Perlin = 0,
         DiamondSquare = 1
@@ -113,13 +113,13 @@ public class TerrainGenerator : MonoBehaviour
         // reset rotation
         transform.position = _pivotPoint.transform.position;
         _pivotPoint.rotation = Quaternion.identity;
-        if(_rotate)
-        {
-            // subtract position by half mapsize to make it rotate around the centre
-            Vector3 position = transform.position;
-            transform.position =
-                new Vector3(position.x - (_mapSize * 0.5f), position.y, position.z - (_mapSize * 0.5f));
-        }
+        
+        // subtract position by half mapsize to make it rotate around 0,0
+        Vector3 position = transform.position;
+        transform.position = new Vector3(position.x - (_mapSize * 0.5f), position.y, position.z - (_mapSize * 0.5f));
+
+        // set camera pos
+        _camera.transform.position = new Vector3(-(_mapSize * 0.5f) - (_mapSize * 0.2f), _camera.transform.position.y, 0.0f);
     }
 
     private void GenerateTerrain(float[,] map)
@@ -176,5 +176,23 @@ public class TerrainGenerator : MonoBehaviour
         {
             _pivotPoint.rotation *= Quaternion.Euler(Vector3.up * (_rotateSpeed * Time.deltaTime));
         }
+    }
+
+    public int SetMapSize(int size)
+    {
+        if (size != oldSize)
+        {
+            // check if mapsize is power of 2
+            if ((size & (size - 1)) == 0)
+            {
+                oldSize = size;
+                _mapSize = size;
+            }
+            else
+            {
+                _mapSize = oldSize;
+            }
+        }
+        return _mapSize;
     }
 }
