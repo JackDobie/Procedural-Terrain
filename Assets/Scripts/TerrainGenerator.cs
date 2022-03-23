@@ -110,8 +110,9 @@ public class TerrainGenerator : MonoBehaviour
             GenerateMesh(heightMap);
         }
         
-        // reset rotation
+        // reset rotation to properly move objects
         transform.position = _pivotPoint.transform.position;
+        Quaternion prevRotation = _pivotPoint.rotation;
         _pivotPoint.rotation = Quaternion.identity;
         
         // subtract position by half mapsize to make it rotate around 0,0
@@ -120,6 +121,9 @@ public class TerrainGenerator : MonoBehaviour
 
         // set camera pos
         _camera.transform.position = new Vector3(-(_mapSize * 0.5f) - (_mapSize * 0.2f), _camera.transform.position.y, 0.0f);
+        
+        // reset rotation back to previous state
+        _pivotPoint.rotation = prevRotation;
     }
 
     private void GenerateTerrain(float[,] map)

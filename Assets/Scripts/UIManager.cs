@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,6 +7,7 @@ public class UIManager : MonoBehaviour
 {
     public TerrainGenerator _terrainGenerator;
     public Perlin _perlin;
+    public DiamondSquare _diamondSquare;
 
     [Space]
     public TMP_InputField _seedField;
@@ -13,11 +15,16 @@ public class UIManager : MonoBehaviour
     public TMP_InputField _sizeField;
     public TMP_InputField _heightField;
     [Header("Perlin")]
+    public GameObject _perlinMenu;
     public TMP_InputField _perlinOctavesField;
     public TMP_InputField _perlinPersistenceField;
     public TMP_InputField _perlinOffsetXField;
     public TMP_InputField _perlinOffsetYField;
     public TMP_InputField _perlinScaleField;
+    [Header("Diamond-Square")]
+    public GameObject _DSMenu;
+    public TMP_InputField _DSOffsetField;
+    public TMP_InputField _DSSmoothnessField;
     [Space]
     public TMP_InputField _rotateSpeedField;
 
@@ -34,7 +41,26 @@ public class UIManager : MonoBehaviour
         _perlinOffsetYField.text = _perlin._offset.y.ToString();
         _perlinScaleField.text = _perlin._scale.ToString();
 
+        _DSOffsetField.text = _diamondSquare._offsetRange.ToString();
+        _DSSmoothnessField.text = _diamondSquare._smoothness.ToString();
+
         _rotateSpeedField.text = _terrainGenerator._rotateSpeed.ToString();
+        
+        switch (_terrainGenerator._activeNoise)
+        {
+            case TerrainGenerator.NoiseType.Perlin:
+                _perlinMenu.SetActive(true);
+                _DSMenu.SetActive(false);
+                break;
+            case TerrainGenerator.NoiseType.DiamondSquare:
+                _perlinMenu.SetActive(false);
+                _DSMenu.SetActive(true);
+                break;
+            default:
+                _perlinMenu.SetActive(false);
+                _DSMenu.SetActive(false);
+                break;
+        }
     }
 
     public void SetSeed()
@@ -52,6 +78,22 @@ public class UIManager : MonoBehaviour
     public void SetNoise()
     {
         _terrainGenerator._activeNoise = (TerrainGenerator.NoiseType)_noiseDropdown.value;
+        
+        switch (_terrainGenerator._activeNoise)
+        {
+            case TerrainGenerator.NoiseType.Perlin:
+                _perlinMenu.SetActive(true);
+                _DSMenu.SetActive(false);
+                break;
+            case TerrainGenerator.NoiseType.DiamondSquare:
+                _perlinMenu.SetActive(false);
+                _DSMenu.SetActive(true);
+                break;
+            default:
+                _perlinMenu.SetActive(false);
+                _DSMenu.SetActive(false);
+                break;
+        }
     }
 
     public void SetSize()
@@ -68,7 +110,7 @@ public class UIManager : MonoBehaviour
 
     public void SetHeight()
     {
-        if(int.TryParse(_heightField.text, out int result))
+        if(float.TryParse(_heightField.text, out float result))
         {
             _terrainGenerator._maxHeight = result;
         }
@@ -154,6 +196,52 @@ public class UIManager : MonoBehaviour
         {
             _rotateSpeedField.text = _terrainGenerator._rotateSpeed.ToString();
         }
+    }
+
+    public void DSSetOffset()
+    {
+        if(float.TryParse(_DSOffsetField.text, out float result))
+        {
+            _diamondSquare._offsetRange = result;
+        }
+        else
+        {
+            _DSOffsetField.text = _diamondSquare._offsetRange.ToString();
+        }
+    }
+
+    public void DSSetSmoothness()
+    {
+        if(float.TryParse(_DSSmoothnessField.text, out float result))
+        {
+            _diamondSquare._smoothness = result;
+        }
+        else
+        {
+            _DSSmoothnessField.text = _diamondSquare._smoothness.ToString();
+        }
+    }
+
+    public void Generate()
+    {
+        SetSeed();
+        SetSize();
+        SetHeight();
+        switch (_terrainGenerator._activeNoise)
+        {
+            case TerrainGenerator.NoiseType.Perlin:
+                PerlinSetOctaves();
+                PerlinSetPersistence();
+                PerlinSetOffset();
+                PerlinSetScale();
+                break;
+            case TerrainGenerator.NoiseType.DiamondSquare:
+                DSSetOffset();
+                DSSetSmoothness();
+                break;
+        }
+        
+        _terrainGenerator.Generate();
     }
     
     // todo: rotation
