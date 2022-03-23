@@ -15,24 +15,30 @@ public class TerrainGenerator : MonoBehaviour
     private int oldSize = 128;
     public float _maxHeight;
     
-    [Space] public NoiseType _activeNoise;
+    [Space]
+    public NoiseType _activeNoise;
     private Perlin _perlin;
     private DiamondSquare _diamondSquare;
+    private Worley _worley;
+    [Space]
     private Mesh _mesh;
     private Terrain _terrain;
     
-    [Space] [SerializeField] private bool _useTerrain;
+    [Space]
+    [SerializeField] private bool _useTerrain;
     [ConditionalField(nameof(_useTerrain))]
     [SerializeField] private Material _terrainMat;
     
-    [Space] public bool _rotate;
+    [Space]
+    public bool _rotate;
     [ConditionalField(nameof(_rotate))]
     public float _rotateSpeed;
 
     public enum NoiseType
     {
         Perlin = 0,
-        DiamondSquare = 1
+        DiamondSquare,
+        Worley
     }
 
     private void OnValidate()
@@ -54,8 +60,18 @@ public class TerrainGenerator : MonoBehaviour
 
     private void Awake()
     {
+        if ((_mapSize & (_mapSize - 1)) == 0)
+        {
+            oldSize = _mapSize;
+        }
+        else
+        {
+            _mapSize = oldSize;
+        }
+        
         _perlin = gameObject.GetComponent<Perlin>();
         _diamondSquare = gameObject.GetComponent<DiamondSquare>();
+        _worley = gameObject.GetComponent<Worley>();
         _mesh = new Mesh
         {
             // allows creating mesh with up to 2^32 verts rather than 2^16 at the cost of memory. can create mesh larger than 128x128
@@ -82,6 +98,9 @@ public class TerrainGenerator : MonoBehaviour
                 break;
             case NoiseType.DiamondSquare:
                 heightMap = _diamondSquare.GenerateHeightMap(_seed, _mapSize);
+                break;
+            case NoiseType.Worley:
+                heightMap = _worley.GenerateHeightMap(_seed, _mapSize);
                 break;
             default: // use perlin as default
                 _perlin.Init(_seed, _mapSize);

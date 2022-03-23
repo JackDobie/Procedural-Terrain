@@ -2070,6 +2070,8 @@ MonoBehaviour:
       m_Image: {fileID: 0}
     - m_Text: Diamond-Square
       m_Image: {fileID: 0}
+    - m_Text: Worley Noise
+      m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
@@ -5993,6 +5995,7 @@ GameObject:
   - component: {fileID: 1180547562}
   - component: {fileID: 1180547561}
   - component: {fileID: 1180547567}
+  - component: {fileID: 1180547569}
   - component: {fileID: 1180547568}
   m_Layer: 0
   m_Name: Terrain
@@ -6165,6 +6168,20 @@ Terrain:
   m_GroupingID: 0
   m_RenderingLayerMask: 1
   m_AllowAutoConnect: 0
+--- !u!114 &1180547569
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1180547560}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10998ed7104132f4788ce7e752ef23a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _pointsCount: 8
+  _pointDistance: 1
 --- !u!1 &1242123296
 GameObject:
   m_ObjectHideFlags: 0
