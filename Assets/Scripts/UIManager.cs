@@ -1,13 +1,12 @@
-using System;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
     public TerrainGenerator _terrainGenerator;
     public Perlin _perlin;
     public DiamondSquare _diamondSquare;
+    public Worley _worley;
 
     [Space]
     public TMP_InputField _seedField;
@@ -25,11 +24,16 @@ public class UIManager : MonoBehaviour
     public GameObject _DSMenu;
     public TMP_InputField _DSOffsetField;
     public TMP_InputField _DSSmoothnessField;
+    [Header("Worley")]
+    public GameObject _worleyMenu;
+    public TMP_InputField _worleyCountField;
+    public TMP_InputField _worleyDistanceField;
     [Space]
     public TMP_InputField _rotateSpeedField;
 
     private void Awake()
     {
+        _seedField.characterLimit = int.MaxValue.ToString().Length - 1;
         _seedField.text = _terrainGenerator._seed.ToString();
         _noiseDropdown.value = (int)_terrainGenerator._activeNoise;
         _sizeField.text = _terrainGenerator._mapSize.ToString();
@@ -51,14 +55,22 @@ public class UIManager : MonoBehaviour
             case TerrainGenerator.NoiseType.Perlin:
                 _perlinMenu.SetActive(true);
                 _DSMenu.SetActive(false);
+                _worleyMenu.SetActive(false);
                 break;
             case TerrainGenerator.NoiseType.DiamondSquare:
                 _perlinMenu.SetActive(false);
                 _DSMenu.SetActive(true);
+                _worleyMenu.SetActive(false);
+                break;
+            case TerrainGenerator.NoiseType.Worley:
+                _perlinMenu.SetActive(false);
+                _DSMenu.SetActive(false);
+                _worleyMenu.SetActive(true);
                 break;
             default:
                 _perlinMenu.SetActive(false);
                 _DSMenu.SetActive(false);
+                _worleyMenu.SetActive(false);
                 break;
         }
     }
@@ -84,14 +96,22 @@ public class UIManager : MonoBehaviour
             case TerrainGenerator.NoiseType.Perlin:
                 _perlinMenu.SetActive(true);
                 _DSMenu.SetActive(false);
+                _worleyMenu.SetActive(false);
                 break;
             case TerrainGenerator.NoiseType.DiamondSquare:
                 _perlinMenu.SetActive(false);
                 _DSMenu.SetActive(true);
+                _worleyMenu.SetActive(false);
+                break;
+            case TerrainGenerator.NoiseType.Worley:
+                _perlinMenu.SetActive(false);
+                _DSMenu.SetActive(false);
+                _worleyMenu.SetActive(true);
                 break;
             default:
                 _perlinMenu.SetActive(false);
                 _DSMenu.SetActive(false);
+                _worleyMenu.SetActive(false);
                 break;
         }
     }
@@ -222,6 +242,44 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public void WorleySetCount()
+    {
+        if(int.TryParse(_worleyCountField.text, out int result))
+        {
+            if(result >= 0)
+            {
+                _worley._pointsCount = result;
+            }
+            else
+            {
+                _worleyCountField.text = _worley._pointsCount.ToString();
+            }
+        }
+        else
+        {
+            _worleyCountField.text = _worley._pointsCount.ToString();
+        }
+    }
+
+    public void WorleySetDistance()
+    {
+        if(int.TryParse(_worleyDistanceField.text, out int result))
+        {
+            if(result >= 1 && result < _worley._pointsCount)
+            {
+                _worley._pointDistance = result;
+            }
+            else
+            {
+                _worleyDistanceField.text = _worley._pointDistance.ToString();
+            }
+        }
+        else
+        {
+            _worleyDistanceField.text = _worley._pointDistance.ToString();
+        }
+    }
+
     public void Generate()
     {
         SetSeed();
@@ -238,6 +296,10 @@ public class UIManager : MonoBehaviour
             case TerrainGenerator.NoiseType.DiamondSquare:
                 DSSetOffset();
                 DSSetSmoothness();
+                break;
+            case TerrainGenerator.NoiseType.Worley:
+                WorleySetCount();
+                WorleySetDistance();
                 break;
         }
         

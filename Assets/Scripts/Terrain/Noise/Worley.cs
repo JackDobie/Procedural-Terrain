@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -9,11 +7,16 @@ public class Worley : MonoBehaviour
     public int _pointsCount;
     public int _pointDistance;
 
+    public float scale;
+
     private void OnValidate()
     {
+        _pointsCount = Mathf.Clamp(_pointsCount, 0, int.MaxValue); // pointscount cannot be less than 0
         _pointDistance = Mathf.Clamp(_pointDistance, 1, _pointsCount);
     }
 
+    // gets the distance of the 'pointDistance' closest point.
+    // eg. pointDistance = 2 gets 2nd closest point
     public float[,] GenerateHeightMap(int seed, int size)
     {
         Random.InitState(seed);
@@ -48,15 +51,15 @@ public class Worley : MonoBehaviour
                 }
                 //orderedPoints = orderedPoints.OrderBy(x => x.Key).ToList();
                 //map[i, j] = orderedPoints[_pointDistance].Key;
-                map[i, j] = distances[_pointDistance];
+                distances.Sort();
+                float result = distances[_pointDistance - 1] * scale;
+                map[i, j] = result;
             }
         }
 
         return map;
     }
 
-    // gets the distance of the 'pointDistance' closest point.
-    // eg. pointDistance = 2 gets 2nd closest point
     public float Noise(int seed, int size, int x, int y)
     {
         Random.InitState(seed);
@@ -79,6 +82,8 @@ public class Worley : MonoBehaviour
             distances.Add(distance);
         }
 
-        return distances[_pointDistance];
+        distances.Sort();
+        float result = distances[_pointDistance - 1];
+        return result;
     }
 }
