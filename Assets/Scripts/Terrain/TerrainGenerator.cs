@@ -2,7 +2,8 @@ using System.Collections.Generic;
 using MyBox;
 using UnityEngine;
 
-[RequireComponent(typeof(Perlin), typeof(DiamondSquare))]
+[RequireComponent(typeof(Perlin), typeof(DiamondSquare), typeof(Worley))]
+[RequireComponent(typeof(HydraulicErosion))]
 [RequireComponent(typeof(MeshFilter))]
 public class TerrainGenerator : MonoBehaviour
 {
@@ -20,6 +21,7 @@ public class TerrainGenerator : MonoBehaviour
     private Perlin _perlin;
     private DiamondSquare _diamondSquare;
     private Worley _worley;
+    private HydraulicErosion _hydraulic;
     [Space]
     private Mesh _mesh;
     private Terrain _terrain;
@@ -72,6 +74,8 @@ public class TerrainGenerator : MonoBehaviour
         _perlin = gameObject.GetComponent<Perlin>();
         _diamondSquare = gameObject.GetComponent<DiamondSquare>();
         _worley = gameObject.GetComponent<Worley>();
+        _hydraulic = gameObject.GetComponent<HydraulicErosion>();
+        
         _mesh = new Mesh
         {
             // allows creating mesh with up to 2^32 verts rather than 2^16 at the cost of memory. can create mesh larger than 128x128
@@ -107,26 +111,27 @@ public class TerrainGenerator : MonoBehaviour
                 heightMap = _perlin.GenerateHeightMap();
                 break;
         }
+
+        for (int i = 0; i < _mapSize; i++)
+        {
+            for (int j = 0; j < _mapSize; j++)
+            {
+                heightMap[i, j] *= _maxHeight;
+            }
+        }
         
-        // float[,] scaledHeights = new float[_mapSize, _mapSize];
-        // for (int i = 0; i < _mapSize; i++)
-        // {
-        //     for (int j = 0; j < _mapSize; j++)
-        //     {
-        //         scaledHeights[i, j] = _heightMap[(int)(i / (float)_mapSize * _scale), (int)(j / (float)_mapSize * _scale)];
-        //     }
-        // }
+        float[,] erodedMap = _hydraulic.ErodeHeightMap(heightMap, _mapSize, _seed);
 
         if (_useTerrain)
         {
             _mesh.Clear();
             _terrain.enabled = true;
-            GenerateTerrain(heightMap);   
+            GenerateTerrain(erodedMap);
         }
         else
         {
             _terrain.enabled = false;
-            GenerateMesh(heightMap);
+            GenerateMesh(erodedMap);
         }
         
         // reset rotation to properly move objects
@@ -168,7 +173,8 @@ public class TerrainGenerator : MonoBehaviour
             for(int j = 0; j < size; j++)
             {
                 // add a new vertex using the heightmap data for Y
-                verts.Add(new Vector3(i, map[i, j] * _maxHeight, j));
+                float y = map[i, j];
+                verts.Add(new Vector3(i, y/* * _maxHeight*/, j));
 
                 if (i == 0 || j == 0) continue;
 
@@ -191,6 +197,8 @@ public class TerrainGenerator : MonoBehaviour
         // generate heightmap
         // apply erosion
         // create mesh using heightmap
+
+        Debug.Log(IsMeshOk(_mesh));
     }
 
     private void Update()
@@ -217,5 +225,23 @@ public class TerrainGenerator : MonoBehaviour
             }
         }
         return _mapSize;
+    }
+    
+    private bool IsMeshOk(Mesh m)
+    {
+        foreach (Vector3 v in m.vertices)
+        {
+            if (!IsFinite(v.x) || !IsFinite(v.y) || !IsFinite(v.z))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private bool IsFinite(float f)
+    {
+        return !float.IsInfinity(f) && !float.IsNaN(f);
     }
 }
