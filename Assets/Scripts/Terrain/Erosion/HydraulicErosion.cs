@@ -8,29 +8,44 @@ public class HydraulicErosion : MonoBehaviour
     public float _capacity;
     public int _iterations;
     
-    public float[,] ErodeHeightMap(float[,] heightMap, int size, int seed)
+    public float[,] ErodeHeightMap(float[,] heightMap, int size, float maxHeight)
     {
-        float[,] waterMap = new float[size, size];
-        float[,] sedimentMap = new float[size, size];
+        float[,] h = new float[size,size];
+        for (int i = 0; i < size; i++)
+        {
+            for (int j = 0; j < size; j++)
+            {
+                h[i, j] = heightMap[i, j];
+            }
+        }
+        
+        float Kr = _rain;
+        float Ks = _solubility;
+        float Ke = _evaporation;
+        float Kc = _capacity;
+        // water map
+        float[,] w = new float[size, size];
+        // sediment map
+        float[,] m = new float[size, size];
         for (int iteration = 0; iteration < _iterations; iteration++)
         {
-            for (int x = 0; x < size; x++)
+            for (int i = 0; i < size; i++)
             {
-                for (int y = 0; y < size; y++)
+                for (int j = 0; j < size; j++)
                 {
                     // add rain
-                    waterMap[x, y] += _rain;
+                    w[i, j] += Kr;
                     
                     // move solid ground to sediment
-                    sedimentMap[x, y] += _solubility * waterMap[x, y];
-                    heightMap[x, y] -= _solubility * waterMap[x, y];
+                    h[i, j] -= Ks * w[i, j];
+                    m[i, j] += Ks * w[i, j];
                     // return excess to heightmap
-                    if (sedimentMap[x, y] > _capacity)
-                    {
-                        float excess = _capacity - sedimentMap[x, y];
-                        sedimentMap[x, y] -= excess;
-                        heightMap[x, y] += excess;
-                    }
+                    // if (M[i, j] > Kc)
+                    // {
+                    //     float excess = Kc - M[i, j];
+                    //     M[i, j] -= excess;
+                    //     heightMap[i, j] += excess;
+                    // }
                 }
             }
             
@@ -44,7 +59,7 @@ public class HydraulicErosion : MonoBehaviour
                     float neighbourAvg = 0.0f;
                     float dTotal = 0.0f;
                     
-                    float a = heightMap[i, j] + waterMap[i, j];
+                    float a = h[i, j] + w[i, j];
                     
                     // average neighbour heights and add up differences
                     int count = 0;
@@ -57,7 +72,7 @@ public class HydraulicErosion : MonoBehaviour
                                 continue;
                             }
                             //aEverage += (waterMap[i + x - 1, j + y - 1] + heightMap[i + x - 1, j + y - 1]) / 9.0f;
-                            float ai = heightMap[i + x, j + y] + waterMap[i + x, j + y];
+                            float ai = h[i + x, j + y] + w[i + x, j + y];
                             neighbourAvg += ai;
                             count++;
                             float di = a - ai;
@@ -80,34 +95,44 @@ public class HydraulicErosion : MonoBehaviour
                             {
                                 continue;
                             }
-                            float ai = heightMap[i + x, j + y] + waterMap[i + x, j + y];
+                            float ai = h[i + x, j + y] + w[i + x, j + y];
                             float di = a - ai;
 
-                            // the amount of water moved to neighbour
-                            float deltaW = 0;
                             if (dTotal != 0)
                             {
-                                deltaW = Mathf.Min(waterMap[i, j], deltaA) * di / dTotal;
+                                // the amount of water moved to neighbour
+                                float deltaW = Mathf.Min(w[i, j], deltaA) * di / dTotal;
 
-                                if (waterMap[i, j] != 0)
+                                if (w[i, j] != 0)
                                 {
                                     // transport sediment to neighbouring cells
-                                    sedimentMap[i + x, j + y] += sedimentMap[i, j] * (deltaW / waterMap[i, j]);
-                                    sedimentMap[i, j] -= sedimentMap[i, j] * (deltaW / waterMap[i, j]);
+                                    m[i + x, j + y] += m[i, j] * (deltaW / w[i, j]);
+                                    m[i, j] -= m[i, j] * (deltaW / w[i, j]);
                                 }
                             }
                         }
                     }
 
-                    waterMap[i, j] *= (1 - _evaporation);
-                    float mMax = _capacity * waterMap[i, j];
-                    float deltaM = Mathf.Max(0, sedimentMap[i, j] - mMax);
-                    sedimentMap[i, j] -= deltaM;
-                    heightMap[i, j] += deltaM;
+                    w[i, j] *= (1 - Ke);
+                    float mMax = Kc * w[i, j];
+                    float prevM = m[i, j];
+                    float deltaM = Mathf.Max(0, m[i, j] - mMax);
+                    // if (float.IsNaN(deltaM) || float.IsInfinity(deltaM))
+                    // {
+                    //     deltaM = 0;
+                    // }
+                    m[i, j] -= deltaM;
+                    float prev = h[i, j];
+                    h[i, j] += deltaM;
+                    if (float.IsNaN(h[i, j]) || float.IsInfinity(h[i, j]) || h[i, j] > maxHeight)
+                    {
+                        h[i, j] = heightMap[i, j];
+                        //Debug.Log("bruh " + i + ", " + j + ", prev: " + prev + ", " + prevM);
+                    }
                 }
             }
         }
         
-        return heightMap;
+        return h;
     }
 }

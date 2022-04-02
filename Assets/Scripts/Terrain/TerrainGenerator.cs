@@ -111,27 +111,37 @@ public class TerrainGenerator : MonoBehaviour
                 heightMap = _perlin.GenerateHeightMap();
                 break;
         }
-
+        
+        float[,] erodedMap = _hydraulic.ErodeHeightMap(heightMap, _mapSize, _maxHeight * 5);
         for (int i = 0; i < _mapSize; i++)
         {
             for (int j = 0; j < _mapSize; j++)
             {
-                heightMap[i, j] *= _maxHeight;
+                erodedMap[i, j] *= _maxHeight;
             }
         }
         
-        float[,] erodedMap = _hydraulic.ErodeHeightMap(heightMap, _mapSize, _seed);
-
-        if (_useTerrain)
+        float[] result = IsMapOk(erodedMap);
+        switch (result[0])
         {
-            _mesh.Clear();
-            _terrain.enabled = true;
-            GenerateTerrain(erodedMap);
-        }
-        else
-        {
-            _terrain.enabled = false;
-            GenerateMesh(erodedMap);
+            case -1:
+                Debug.Log("Mesh is ok");
+        
+                if (_useTerrain)
+                {
+                    _mesh.Clear();
+                    _terrain.enabled = true;
+                    GenerateTerrain(erodedMap);
+                }
+                else
+                {
+                    _terrain.enabled = false;
+                    GenerateMesh(erodedMap);
+                }
+                break;
+            default:
+                Debug.Log("Mesh not ok - broke at " + result[0] + "," + result[1]);
+                break;
         }
         
         // reset rotation to properly move objects
@@ -187,7 +197,7 @@ public class TerrainGenerator : MonoBehaviour
                 tris.Add(size * i + j); // TR
             }
         }
-
+        
         // update mesh
         _mesh.Clear();
         _mesh.vertices = verts.ToArray();
@@ -197,8 +207,6 @@ public class TerrainGenerator : MonoBehaviour
         // generate heightmap
         // apply erosion
         // create mesh using heightmap
-
-        Debug.Log(IsMeshOk(_mesh));
     }
 
     private void Update()
@@ -227,21 +235,32 @@ public class TerrainGenerator : MonoBehaviour
         return _mapSize;
     }
     
-    private bool IsMeshOk(Mesh m)
+    private float[] IsMapOk(float[,] map)
     {
-        foreach (Vector3 v in m.vertices)
+        for (int i = 0; i < _mapSize; i++)
         {
-            if (!IsFinite(v.x) || !IsFinite(v.y) || !IsFinite(v.z))
+            for (int j = 0; j < _mapSize; j++)
             {
-                return false;
+                if (!IsFinite(map[i, j]))
+                {
+                    float[] val = new float[2];
+                    return new float[2]{i, j};
+                }
             }
         }
+        // foreach (Vector3 v in m.vertices)
+        // {
+        //     if (!IsFinite(v.x) || !IsFinite(v.y) || !IsFinite(v.z))
+        //     {
+        //         return false;
+        //     }
+        // }
 
-        return true;
+        return new float[1] {-1};
     }
 
     private bool IsFinite(float f)
     {
-        return !float.IsInfinity(f) && !float.IsNaN(f);
+        return !float.IsInfinity(f) && !float.IsNaN(f) && !(f > _maxHeight * 2);
     }
 }
