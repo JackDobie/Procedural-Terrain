@@ -1,5 +1,7 @@
+using System;
 using MyBox;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Perlin : MonoBehaviour
 {
@@ -72,9 +74,9 @@ public class Perlin : MonoBehaviour
     public float Noise(float x, float y)
     {
         // find positions of each corner
-        int x0 = Mathf.FloorToInt(x);
+        int x0 = Convert.ToInt32(Math.Floor(x));
         int x1 = x0 + 1;
-        int y0 = Mathf.FloorToInt(y);
+        int y0 = Convert.ToInt32(Math.Floor(y));
         int y1 = y0 + 1;
 
         // find interpolation weights

@@ -22,6 +22,7 @@ public class TerrainGenerator : MonoBehaviour
     private DiamondSquare _diamondSquare;
     private Worley _worley;
     private HydraulicErosion _hydraulic;
+    //private HydraulicErosionOLD _hydraulicOLD;
     [Space]
     private Mesh _mesh;
     private Terrain _terrain;
@@ -75,6 +76,7 @@ public class TerrainGenerator : MonoBehaviour
         _diamondSquare = gameObject.GetComponent<DiamondSquare>();
         _worley = gameObject.GetComponent<Worley>();
         _hydraulic = gameObject.GetComponent<HydraulicErosion>();
+        //_hydraulicOLD = gameObject.GetComponent<HydraulicErosionOLD>();
         
         _mesh = new Mesh
         {
@@ -111,21 +113,27 @@ public class TerrainGenerator : MonoBehaviour
                 heightMap = _perlin.GenerateHeightMap();
                 break;
         }
-        
-        float[,] erodedMap = _hydraulic.ErodeHeightMap(heightMap, _mapSize, _maxHeight * 5);
         for (int i = 0; i < _mapSize; i++)
         {
             for (int j = 0; j < _mapSize; j++)
             {
-                erodedMap[i, j] *= _maxHeight;
+                heightMap[i, j] *= _maxHeight;
             }
         }
+        float[,] erodedMap = _hydraulic.ErodeMap(heightMap, _mapSize, _seed);
+        // for (int i = 0; i < _mapSize; i++)
+        // {
+        //     for (int j = 0; j < _mapSize; j++)
+        //     {
+        //         erodedMap[i, j] *= _maxHeight;
+        //     }
+        // }
         
         float[] result = IsMapOk(erodedMap);
         switch (result[0])
         {
             case -1:
-                Debug.Log("Mesh is ok");
+                //Debug.Log("Mesh is ok");
         
                 if (_useTerrain)
                 {
@@ -243,8 +251,7 @@ public class TerrainGenerator : MonoBehaviour
             {
                 if (!IsFinite(map[i, j]))
                 {
-                    float[] val = new float[2];
-                    return new float[2]{i, j};
+                    return new float[]{i, j};
                 }
             }
         }
@@ -256,11 +263,11 @@ public class TerrainGenerator : MonoBehaviour
         //     }
         // }
 
-        return new float[1] {-1};
+        return new float[] {-1};
     }
 
-    private bool IsFinite(float f)
+    public static bool IsFinite(float f)
     {
-        return !float.IsInfinity(f) && !float.IsNaN(f) && !(f > _maxHeight * 2);
+        return !float.IsInfinity(f) && !float.IsNaN(f);
     }
 }

@@ -6379,6 +6379,8 @@ GameObject:
   - component: {fileID: 1180547567}
   - component: {fileID: 1180547569}
   - component: {fileID: 1180547563}
+  - component: {fileID: 1180547570}
+  - component: {fileID: 1180547571}
   m_Layer: 0
   m_Name: Terrain
   m_TagString: Untagged
@@ -6416,10 +6418,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _camera: {fileID: 963194227}
   _pivotPoint: {fileID: 916279012}
-  _seed: 98465
+  _seed: 66231
   _mapSize: 512
   _maxHeight: 100
-  _activeNoise: 0
+  _activeNoise: 2
   _useTerrain: 0
   _terrainMat: {fileID: 2100000, guid: 6eb12f94163d54e458ce7ae26739ca6f, type: 2}
   _rotate: 0
@@ -6436,11 +6438,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5608eaedd1ab2b42952fbb9add9568f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rain: 0.1
-  _solubility: 0.1
-  _evaporation: 5
-  _capacity: 0.1
-  _iterations: 0
+  _iterations: 1000
+  Kq: 10
+  _evaporation: 0.001
+  _erosionSpeed: 0.9
+  _depositSpeed: 0.02
+  _inertia: 0.1
+  _gravity: 20
+  _minSlope: 0.05
+  _depositAmount: 0.001
 --- !u!23 &1180547564
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -6519,7 +6525,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _offsetRange: 1
   _smoothness: 1
-  _clamp: 0
+  _clamp: 1
 --- !u!218 &1180547568
 Terrain:
   m_ObjectHideFlags: 0
@@ -6569,6 +6575,53 @@ MonoBehaviour:
   _pointsCount: 8
   _pointDistance: 1
   scale: 0.002
+--- !u!114 &1180547570
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1180547560}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d426bd1cfe253940979b16f2bb8b353, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _erosionRadius: 3
+  _inertia: 0.05
+  _sedimentCapacityFactor: 4
+  _minSedimentCapacity: 0.01
+  _erodeSpeed: 0.3
+  _depositSpeed: 0.3
+  _evaporateSpeed: 0.01
+  _gravity: 4
+  _maxDropletLifetime: 30
+  _initialWaterVolume: 1
+  _initialSpeed: 1
+  _iterations: 1000
+--- !u!114 &1180547571
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1180547560}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c61621698fca7b14cb3bfede54d22d46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _iterations: 1
+  _particleCount: 1000
+  _lifetime: 30
+  _gravity: 4
+  _erosionRadius: 1
+  _inertia: 0.1
+  _capacity: 10
+  _evaporationSpeed: 0.05
+  _erosionSpeed: 0.1
+  _depositSpeed: 0.1
+  _minSlope: 0.001
 --- !u!1 &1242123296
 GameObject:
   m_ObjectHideFlags: 0
