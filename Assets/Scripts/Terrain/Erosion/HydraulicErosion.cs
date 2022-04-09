@@ -32,6 +32,15 @@ public class HydraulicErosion : MonoBehaviour
 
     private struct Droplet
     {
+        public Droplet(Vector2 position_, Vector2 direction_, float velocity_, float sediment_, float water_)
+        {
+            position = position_;
+            direction = direction_;
+            velocity = velocity_;
+            sediment = sediment_;
+            water = water_;
+        }
+        
         public Vector2 position;
         public Vector2 direction;
         public float velocity;
@@ -64,7 +73,6 @@ public class HydraulicErosion : MonoBehaviour
         Random.InitState(seed);
         _map = map;
         _mapSize = size;
-        //_droplets = new List<Droplet>();
     }
     
     public float[,] ErodeMap(float[,] map, int size, int seed)
@@ -74,13 +82,8 @@ public class HydraulicErosion : MonoBehaviour
         {
             for (int i = 0; i < _particleCount; i++)
             {
-                Droplet d;
-                d.position = new Vector2(Random.Range(0, size), Random.Range(0, size));
-                d.direction = Vector2.zero;
-                d.velocity = 0;
-                d.sediment = 0;
-                d.water = 0;
-                //_droplets.Add(d);
+                Droplet d = new Droplet(new Vector2(Random.Range(0, size), Random.Range(0, size)),
+                    Vector2.zero, 0, 0, 0);
                 for (int j = 0; j < _lifetime; j++)
                 {
                     HeightAndGradient hg = CalculateHeightAndGradient(d);
@@ -88,8 +91,9 @@ public class HydraulicErosion : MonoBehaviour
                     // calculate new direction by blending gradient and oldDir, affected by inertia
                     // dirNew = dirOld * inertia - g * (1 - inertia)
                     Vector2 oldDir = d.direction;
-                    d.direction = new Vector2(oldDir.x * _inertia - hg.gradient.x * (1 - _inertia),
-                        oldDir.y * _inertia - hg.gradient.y * (1 - _inertia));
+                    d.direction = (oldDir * _inertia) - (hg.gradient * (1 - _inertia));
+                    d.direction = d.direction.normalized;
+                    d.direction += oldDir;
                     d.direction = d.direction.normalized;
 
                     // calculate new position by adding direction to old pos
@@ -366,9 +370,12 @@ public class HydraulicErosion : MonoBehaviour
         // calc droplet direction with bilinear interpolation
         // float gradX = (h10 - h00) * (1 - yf) + (h11 - h01) * yf;
         // float gradY = (h01 - h00) * (1 - xf) + (h11 - h10) * xf;
-        Vector2 gradX = (g10 - g00) * (1 - posdif.y) + (g11 - g01) * posdif.y;
-        Vector2 gradY = (g01 - g00) * (1 - posdif.x) + (g11 - g10) * posdif.x;
-        Vector2 grad = gradX + gradY;
+        // Vector2 gradX = (g10 - g00) * (1 - posdif.y) + (g11 - g01) * posdif.y;
+        // Vector2 gradY = (g01 - g00) * (1 - posdif.x) + (g11 - g10) * posdif.x;
+        float gradX = (h00 - h10) * (1 - posdif.y) + (h01 - h11) * posdif.y;
+        float gradY = (h00 - h01) * (1 - posdif.x) + (h10 - h11) * posdif.x;
+        Vector2 grad = new Vector2(gradX, gradY);
+        //Vector2 grad = gradX + gradY;
 
         // calc height
         //float height = h01 * (1 - xf) * (1 - yf) + h01 * xf * (1 - yf) + h10 * (1 - xf) * yf + h11 * xf * yf;
