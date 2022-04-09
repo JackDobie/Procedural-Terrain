@@ -1,6 +1,5 @@
-using System.Collections.Generic;
-using MyBox;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class HydraulicErosion : MonoBehaviour
 {
@@ -12,6 +11,7 @@ public class HydraulicErosion : MonoBehaviour
     public int _lifetime = 30;
     public int _gravity = 4;
     public int _erosionRadius = 2;
+    private int oldEroRadius = 2;
     [Range(0, 1)] public float _inertia = 0.1f;
     public float _capacity = 10.0f;
     [Range(0, 1)] public float _evaporationSpeed = 0.1f;
@@ -22,7 +22,15 @@ public class HydraulicErosion : MonoBehaviour
 
     //private List<Droplet> _droplets;
 
-    struct Droplet
+    private void OnValidate()
+    {
+        if (_erosionRadius < 2)
+            _erosionRadius = oldEroRadius;
+        else
+            oldEroRadius = _erosionRadius;
+    }
+
+    private struct Droplet
     {
         public Vector2 position;
         public Vector2 direction;
@@ -45,7 +53,7 @@ public class HydraulicErosion : MonoBehaviour
         }
     }
 
-    struct HeightAndGradient
+    private struct HeightAndGradient
     {
         public Vector2 gradient;
         public float height;
@@ -75,8 +83,7 @@ public class HydraulicErosion : MonoBehaviour
                 //_droplets.Add(d);
                 for (int j = 0; j < _lifetime; j++)
                 {
-                    Vector2 oldPos = d.position;
-                    HeightAndGradient hg = CalculateHeightAndGradient(map, d);
+                    HeightAndGradient hg = CalculateHeightAndGradient(d);
 
                     // calculate new direction by blending gradient and oldDir, affected by inertia
                     // dirNew = dirOld * inertia - g * (1 - inertia)
@@ -89,15 +96,16 @@ public class HydraulicErosion : MonoBehaviour
                     //d.position = oldPos + d.direction;
                     d.position += d.direction;
 
-                    if (d.position.x < 0 || d.position.y < 0 || d.position.x >= _mapSize || d.position.y >= _mapSize)
+                    if (d.position.x < 0 || d.position.y < 0 || d.position.x >= _mapSize - 1 || d.position.y >= _mapSize - 1)
                     {
                         break;
                     }
 
-                    HeightAndGradient hgNew = CalculateHeightAndGradient(map, d);
+                    //HeightAndGradient hgNew = CalculateHeightAndGradient(d);
+                    float newHeight = CalculateHeight2(d);
 
                     // calculate height difference
-                    float deltaHeight = hg.height - hgNew.height;
+                    float deltaHeight = hg.height - newHeight;
 
                     if (deltaHeight > 0.0f) // droplet moved uphill
                     {
@@ -163,27 +171,48 @@ public class HydraulicErosion : MonoBehaviour
         y = Mathf.Clamp(y, (int)0, _mapSize - 1);
         // distribute among surrounding points
         // no radius is used because would lift up pits, not fill them
-        if (x - 1 >= 0)
-        {
-            // -1 0
-            _map[x - 1, y] += amount * (1 - dx) * (1 - dy);
-        }
+        
+        // _map[x, y] += amount * (1 - dx) * (1 - dy); // 00
+        // _map[x + 1, y] += amount * dx * (1 - dy); // 10
+        // _map[x, y + 1] += amount * (1 - dx) * dy; // 01
+        // _map[x + 1, y + 1] += amount * dx * dy; // 11
+        
+        _map[x, y] += amount * (1 - dx) * (1 - dy); // 00
         if (x + 1 < _mapSize)
         {
-            // 1 0
-            _map[x + 1, y] += amount * dx * (1 - dy);
-        }
-        if (y - 1 >= 0)
-        {
-            // 0 1
-            _map[x, y - 1] += amount * (1 - dx) * dy;
+            _map[x + 1, y] += amount * dx * (1 - dy); // 10
+        
+            if (y + 1 < _mapSize)
+            {
+                _map[x + 1, y + 1] += amount * dx * dy; // 11
+            }
         }
         if (y + 1 < _mapSize)
         {
-            // 1 0
-            _map[x, y + 1] += amount * dx * dy;
+            _map[x, y + 1] += amount * (1 - dx) * dy; // 01
         }
-        _map[x, y] += amount;
+        
+        // if (x - 1 >= 0)
+        // {
+        //     // -1 0
+        //     _map[x - 1, y] += amount * (1 - dx) * (1 - dy);
+        // }
+        // if (x + 1 < _mapSize)
+        // {
+        //     // 1 0
+        //     _map[x + 1, y] += amount * dx * (1 - dy);
+        // }
+        // if (y - 1 >= 0)
+        // {
+        //     // 0 1
+        //     _map[x, y - 1] += amount * (1 - dx) * dy;
+        // }
+        // if (y + 1 < _mapSize)
+        // {
+        //     // 1 0
+        //     _map[x, y + 1] += amount * dx * dy;
+        // }
+        // _map[x, y] += amount;
 
         // float u = _map[x, y + 1];
         // float d = _map[x, y - 1];
@@ -229,9 +258,9 @@ public class HydraulicErosion : MonoBehaviour
 
         float[,] weights = new float[(_erosionRadius * 2) + 1, (_erosionRadius * 2) + 1];
         float wSum = 0;
-        for (int y = yStart; y < yEnd; y++)
+        for (int x = xStart; x < xEnd; x++)
         {
-            for (int x = xStart; x < xEnd; x++)
+            for (int y = yStart; y < yEnd; y++)
             {
                 float deltaX = x - d.position.x;
                 float deltaY = y - d.position.y;
@@ -249,51 +278,85 @@ public class HydraulicErosion : MonoBehaviour
                 // normalise weights and remove from map
                 if (wSum > 0)
                 {
-                    float prev = _map[x - x0, y - y0];
-                    weights[x - x0, y - y0] /= wSum;
-                    _map[x - x0, y - y0] -= amount * (weights[x - x0, y - y0] /* * _erosionFactor*/);
+                    // x counts up from x0, so use the difference as the index
+                    int indexX = x - x0;
+                    int indexY = y - y0;
+                    //float prev = _map[indexX, indexY];
+                    weights[indexX, indexY] /= wSum;
+                    float erodeAmount = amount * weights[x - x0, y - y0];// * _erosionFactor
+                    _map[x, y] -= erodeAmount;
+                    d.sediment += erodeAmount;
                 }
             }
         }
         
-        d.sediment += amount;
-        // _map[d.position.x, d.position.y] -= amount;
+        //d.sediment += amount;
         return d.sediment;
     }
-    
-    private HeightAndGradient CalculateHeightAndGradient(float[,] map, Droplet d)
+
+    private float CalculateHeight(Droplet d)
     {
         Vector2Int iPos = d.posInt;
-
-        if (iPos.x < 0) iPos.x = 0;
-        if (iPos.y < 0) iPos.y = 0;
-        if (iPos.x >= _mapSize) iPos.x = _mapSize - 1;
-        if (iPos.y >= _mapSize) iPos.y = _mapSize - 1;
-        
+        iPos.x = Mathf.Clamp(iPos.x, 0, _mapSize - 1);
+        iPos.y = Mathf.Clamp(iPos.x, 0, _mapSize - 1);
         float xf = d.position.x - iPos.x;
         float yf = d.position.y - iPos.y;
         
-        // calc heights of the four neighbours
-        // float h00 = map[iPos.x, iPos.y];
-        // float h10 = map[iPos.x + 1, iPos.y];
-        // float h01 = map[iPos.x, iPos.y + 1];
-        // float h11 = map[iPos.x + 1, iPos.y + 1];
-
-        float h00 = map[iPos.x, iPos.y];
-        float h10, h01, h11;
-        // if out of bounds, set to current cell (h00)
-        if (iPos.x + 1 < _mapSize)
-        {
-            h10 = map[iPos.x + 1, iPos.y];
-            h11 = iPos.y + 1 < _mapSize ? map[iPos.x + 1, iPos.y + 1] : h00;
-        }
-        else
-        {
-            h10 = h00;
-            h11 = h00;
-        }
-        h01 = iPos.y + 1 < _mapSize ? map[iPos.x, iPos.y + 1] : h00;
+        float h00, h10, h01, h11;
+        float[] neighbours = GetNeighbours(iPos);
+        h00 = neighbours[0];
+        h10 = neighbours[1];
+        h01 = neighbours[2];
+        h11 = neighbours[3];
         
+        return CalculateHeight(h00, h10, h01, h11, xf, yf);
+    }
+
+    private float CalculateHeight2(Vector2 posdif, float[] neighbours)
+    {
+        float h00 = neighbours[0];
+        float h10 = neighbours[1];
+        float h01 = neighbours[2];
+        float h11 = neighbours[3];
+
+        float l = (1 - posdif.y) * h00 + posdif.y * h01;
+        float r = (1 - posdif.y) * h10 + posdif.y * h11;
+        
+        return (1 - posdif.x) * l + posdif.x * r;
+    }
+    
+    private float CalculateHeight2(Droplet d)
+    {
+        Vector2 posf = d.position;
+        Vector2Int posi = d.posInt;
+        Vector2 posdif = posf - posi;
+        
+        float[] neighbours = GetNeighbours(posi);
+
+        return CalculateHeight2(posdif, neighbours);
+    }
+    
+    private float CalculateHeight(float h00, float h10, float h01, float h11, float xf, float yf)
+    {
+        return h01 * (1 - xf) * (1 - yf) + h01 * xf * (1 - yf) + h10 * (1 - xf) * yf + h11 * xf * yf;
+    }
+    
+    private HeightAndGradient CalculateHeightAndGradient(Droplet d)
+    {
+        Vector2Int iPos = d.posInt;
+
+        iPos.x = Mathf.Clamp(iPos.x, 0, _mapSize - 1);
+        iPos.y = Mathf.Clamp(iPos.x, 0, _mapSize - 1);
+
+        Vector2 posdif = d.position - iPos;
+        
+        // calc heights of the four neighbours
+        float[] neighbours = GetNeighbours(iPos);
+        float h00 = neighbours[0];
+        float h10 = neighbours[1];
+        float h01 = neighbours[2];
+        float h11 = neighbours[3];
+
         // calc gradients
         Vector2 g00 = new Vector2(h10 - h00, h01 - h00);
         Vector2 g10 = new Vector2(h10 - h00, h11 - h10);
@@ -303,13 +366,38 @@ public class HydraulicErosion : MonoBehaviour
         // calc droplet direction with bilinear interpolation
         // float gradX = (h10 - h00) * (1 - yf) + (h11 - h01) * yf;
         // float gradY = (h01 - h00) * (1 - xf) + (h11 - h10) * xf;
-        Vector2 gradX = (g10 - g00) * (1 - yf) + (g11 - g01) * yf;
-        Vector2 gradY = (g01 - g00) * (1 - xf) + (g11 - g10) * xf;
+        Vector2 gradX = (g10 - g00) * (1 - posdif.y) + (g11 - g01) * posdif.y;
+        Vector2 gradY = (g01 - g00) * (1 - posdif.x) + (g11 - g10) * posdif.x;
+        Vector2 grad = gradX + gradY;
 
         // calc height
-        float height = h01 * (1 - xf) * (1 - yf) + h01 * xf * (1 - yf) + h10 * (1 - xf) * yf + h11 * xf * yf;
-        //float l = (1 - yf) * h00 + 
+        //float height = h01 * (1 - xf) * (1 - yf) + h01 * xf * (1 - yf) + h10 * (1 - xf) * yf + h11 * xf * yf;
+        //float height = CalculateHeight(h00, h10, h01, h11, xf, yf);
+        float height = CalculateHeight2(posdif, neighbours);
 
-        return new HeightAndGradient() {height = height, gradient = gradX + gradY /*new Vector2(gradX, gradY)*/};
+        return new HeightAndGradient() {height = height, gradient = grad};
+    }
+
+    private float[] GetNeighbours(int x, int y)
+    {
+        float h00, h10, h01, h11;
+        h00 = h10 = h01 = h11 = _map[x, y];
+        // if out of bounds, set to current cell (h00)
+        if (x + 1 < _mapSize)
+        {
+            h10 = _map[x + 1, y];
+            
+            if (y + 1 < _mapSize)
+                h11 = _map[x + 1, y + 1];
+        }
+        if (y + 1 < _mapSize)
+            h01 = _map[x, y + 1];
+
+        return new float[] {h00, h10, h01, h11};
+    }
+    
+    private float[] GetNeighbours(Vector2Int pos)
+    {
+        return GetNeighbours(pos.x, pos.y);
     }
 }
