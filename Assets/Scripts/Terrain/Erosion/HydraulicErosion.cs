@@ -343,15 +343,15 @@ public class HydraulicErosion : MonoBehaviour
     
     private HeightAndGradient CalculateHeightAndGradient(Droplet d)
     {
-        Vector2Int iPos = d.posInt;
+        Vector2Int posi = d.posInt;
 
-        iPos.x = Mathf.Clamp(iPos.x, 0, _mapSize - 1);
-        iPos.y = Mathf.Clamp(iPos.x, 0, _mapSize - 1);
+        posi.x = Mathf.Clamp(posi.x, 0, _mapSize - 1);
+        posi.y = Mathf.Clamp(posi.y, 0, _mapSize - 1);
 
-        Vector2 posdif = d.position - iPos;
+        Vector2 posdif = d.position - posi;
         
         // calc heights of the four neighbours
-        float[] neighbours = GetNeighbours(iPos);
+        float[] neighbours = GetNeighbours(posi);
         float h00 = neighbours[0];
         float h10 = neighbours[1];
         float h01 = neighbours[2];
