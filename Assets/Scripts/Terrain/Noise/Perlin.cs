@@ -5,7 +5,8 @@ using Random = UnityEngine.Random;
 
 public class Perlin : MonoBehaviour
 {
-    private int _mapSize = 0;
+    private int _mapSize;
+    private int _oldMapSize;
     public int _octaves;
     [ConditionalField(nameof(_octaves), true, 0)]
     public float _persistence;
@@ -26,6 +27,7 @@ public class Perlin : MonoBehaviour
     public void Init(int seed, int mapSize)
     {
         _mapSize = mapSize;
+        _oldMapSize = _mapSize;
         _gradients = GenerateGridGradients(seed);
     }
 
@@ -33,7 +35,6 @@ public class Perlin : MonoBehaviour
     {
         float[,] heightMap = new float[_mapSize, _mapSize];
         
-        //todo: add octaves
         for (int i = 0; i < _mapSize; i++)
         {
             for(int j = 0; j < _mapSize; j++)
@@ -71,7 +72,7 @@ public class Perlin : MonoBehaviour
         return _gradients;
     }
 
-    public float Noise(float x, float y)
+    private float Noise(float x, float y)
     {
         // find positions of each corner
         int x0 = Convert.ToInt32(Math.Floor(x));
@@ -94,7 +95,7 @@ public class Perlin : MonoBehaviour
         return result;
 	}
 
-    public float OctaveNoise(float x, float y)
+    private float OctaveNoise(float x, float y)
     {
         float total = 0;
         float frequency = 1;
@@ -125,7 +126,7 @@ public class Perlin : MonoBehaviour
         return (dx * gradient.x + dy * gradient.y);
     }
 
-    float Interpolate(float a0, float a1, float w)
+    private float Interpolate(float a0, float a1, float w)
     {
         /* // You may want clamping by inserting:
          * if (0.0 > w) return a0;
@@ -143,8 +144,28 @@ public class Perlin : MonoBehaviour
     }
 
     // Fade function defined by Ken Perlin. Eases coordinate values so that they will ease towards integral values. This smooths the final output
-    float Fade(float t)
+    private float Fade(float t)
     {
         return t * t * t * (t * (t * 6 - 15) + 10);
+    }
+
+    public float SetScale(float scale)
+    {
+        _scale = Mathf.Clamp(scale, 0, (_mapSize / _octaves) - 1);
+        return _scale;
+    }
+    
+    public void SetOctaves(int octaves)
+    {
+        _octaves = octaves;
+        if (octaves == 0)
+        {
+            _mapSize = _oldMapSize;
+        }
+        else
+        {
+            _mapSize = _oldMapSize / octaves;
+            SetScale(_scale); //update scale because octaves updated
+        }
     }
 }

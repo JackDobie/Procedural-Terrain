@@ -21,8 +21,8 @@ public class TerrainGenerator : MonoBehaviour
     private Perlin _perlin;
     private DiamondSquare _diamondSquare;
     private Worley _worley;
+    public ErosionType _activeErosion;
     private HydraulicErosion _hydraulic;
-    //private HydraulicErosionOLD _hydraulicOLD;
     [Space]
     private Mesh _mesh;
     private Terrain _terrain;
@@ -42,6 +42,11 @@ public class TerrainGenerator : MonoBehaviour
         Perlin = 0,
         DiamondSquare,
         Worley
+    }
+    
+    public enum ErosionType
+    {
+        Hydraulic = 0
     }
 
     private void OnValidate()
@@ -76,7 +81,6 @@ public class TerrainGenerator : MonoBehaviour
         _diamondSquare = gameObject.GetComponent<DiamondSquare>();
         _worley = gameObject.GetComponent<Worley>();
         _hydraulic = gameObject.GetComponent<HydraulicErosion>();
-        //_hydraulicOLD = gameObject.GetComponent<HydraulicErosionOLD>();
         
         _mesh = new Mesh
         {

@@ -4,6 +4,8 @@ using UnityEngine;
 public class UIManager : MonoBehaviour
 {
     public TerrainGenerator _terrainGenerator;
+    
+    [Header("Noise")]
     public Perlin _perlin;
     public DiamondSquare _diamondSquare;
     public Worley _worley;
@@ -28,6 +30,21 @@ public class UIManager : MonoBehaviour
     public GameObject _worleyMenu;
     public TMP_InputField _worleyCountField;
     public TMP_InputField _worleyDistanceField;
+    [Header("Erosion")]
+    public HydraulicErosion _hydraulic;
+    [Space]
+    public TMP_Dropdown _erosionDropdown;
+    [Header("Hydraulic Erosion")]
+    public GameObject _hydraulicMenu;
+    public TMP_InputField _hydraulicIterationsField;
+    public TMP_InputField _hydraulicParticleCountField;
+    public TMP_InputField _hydraulicGravityField;
+    public TMP_InputField _hydraulicErosionRadiusField;
+    public TMP_InputField _hydraulicInertiaField;
+    public TMP_InputField _hydraulicCapacityField;
+    public TMP_InputField _hydraulicEvaporationSpeedField;
+    public TMP_InputField _hydraulicDepositSpeedField;
+    public TMP_InputField _hydraulicMinSlopeField;
     [Space]
     public TMP_InputField _rotateSpeedField;
 
@@ -48,6 +65,9 @@ public class UIManager : MonoBehaviour
         _DSOffsetField.text = _diamondSquare._offsetRange.ToString();
         _DSSmoothnessField.text = _diamondSquare._smoothness.ToString();
 
+        _worleyCountField.text = _worley._pointsCount.ToString();
+        _worleyDistanceField.text = _worley._pointDistance.ToString();
+        
         _rotateSpeedField.text = _terrainGenerator._rotateSpeed.ToString();
         
         switch (_terrainGenerator._activeNoise)
@@ -73,6 +93,16 @@ public class UIManager : MonoBehaviour
                 _worleyMenu.SetActive(false);
                 break;
         }
+
+        _hydraulicIterationsField.text = _hydraulic._iterations.ToString();
+        _hydraulicParticleCountField.text = _hydraulic._particleCount.ToString();
+        _hydraulicGravityField.text = _hydraulic._gravity.ToString();
+        _hydraulicErosionRadiusField.text = _hydraulic._erosionRadius.ToString();
+        _hydraulicInertiaField.text = _hydraulic._inertia.ToString();
+        _hydraulicCapacityField.text = _hydraulic._capacity.ToString();
+        _hydraulicEvaporationSpeedField.text = _hydraulic._evaporationSpeed.ToString();
+        _hydraulicDepositSpeedField.text = _hydraulic._depositSpeed.ToString();
+        _hydraulicMinSlopeField.text = _hydraulic._minSlope.ToString();
     }
 
     public void SetSeed()
@@ -144,7 +174,9 @@ public class UIManager : MonoBehaviour
     {
         if(int.TryParse(_perlinOctavesField.text, out int result))
         {
-            _perlin._octaves = result;
+            _perlin.SetOctaves(result);
+            _sizeField.text = _perlin._scale.ToString();
+            //_perlin.SetScale(_perlin._scale).ToString(); // update scale because octaves updated
         }
         else
         {
@@ -193,7 +225,7 @@ public class UIManager : MonoBehaviour
     {
         if(float.TryParse(_perlinScaleField.text, out float result))
         {
-            _perlin._scale = result;
+            _perlinScaleField.text = _perlin.SetScale(result).ToString();
         }
         else
         {
@@ -280,6 +312,161 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public void SetErosion()
+    {
+        _terrainGenerator._activeErosion = (TerrainGenerator.ErosionType) _erosionDropdown.value;
+        switch (_terrainGenerator._activeErosion)
+        {
+            case TerrainGenerator.ErosionType.Hydraulic:
+                _hydraulicMenu.SetActive(true);
+                break;
+            default:
+                _hydraulicMenu.SetActive(false);
+                break;
+        }
+    }
+
+    public void HydraulicSetIterations()
+    {
+        if (int.TryParse(_hydraulicIterationsField.text, out int result))
+        {
+            _hydraulic._iterations = result;
+        }
+        else
+        {
+            _hydraulicIterationsField.text = _hydraulic._iterations.ToString();
+        }
+    }
+
+    public void HydraulicSetParticleCount()
+    {
+        if (int.TryParse(_hydraulicParticleCountField.text, out int result))
+        {
+            _hydraulic._particleCount = result;
+        }
+        else
+        {
+            _hydraulicParticleCountField.text = _hydraulic._particleCount.ToString();
+        }
+    }
+
+    public void HydraulicSetGravity()
+    {
+        if (int.TryParse(_hydraulicGravityField.text, out int result))
+        {
+            _hydraulic._gravity = result;
+        }
+        else
+        {
+            _hydraulicGravityField.text = _hydraulic._gravity.ToString();
+        }
+    }
+    
+    public void HydraulicSetErosionRadius()
+    {
+        if (int.TryParse(_hydraulicErosionRadiusField.text, out int result))
+        {
+            _hydraulic._erosionRadius = result;
+        }
+        else
+        {
+            _hydraulicErosionRadiusField.text = _hydraulic._erosionRadius.ToString();
+        }
+    }
+    
+    public void HydraulicSetInertia()
+    {
+        if (float.TryParse(_hydraulicInertiaField.text, out float result))
+        {
+            _hydraulic._inertia = result;
+        }
+        else
+        {
+            _hydraulicInertiaField.text = _hydraulic._inertia.ToString();
+        }
+    }
+    
+    public void HydraulicSetCapacity()
+    {
+        if (float.TryParse(_hydraulicCapacityField.text, out float result))
+        {
+            _hydraulic._capacity = result;
+        }
+        else
+        {
+            _hydraulicCapacityField.text = _hydraulic._capacity.ToString();
+        }
+    }
+    
+    public void HydraulicSetEvaporationSpeed()
+    {
+        if (float.TryParse(_hydraulicEvaporationSpeedField.text, out float result))
+        {
+            _hydraulic._evaporationSpeed = result;
+        }
+        else
+        {
+            _hydraulicEvaporationSpeedField.text = _hydraulic._evaporationSpeed.ToString();
+        }
+    }
+    
+    public void HydraulicSetDepositSpeed()
+    {
+        if (float.TryParse(_hydraulicDepositSpeedField.text, out float result))
+        {
+            _hydraulic._depositSpeed = result;
+        }
+        else
+        {
+            _hydraulicDepositSpeedField.text = _hydraulic._depositSpeed.ToString();
+        }
+    }
+    
+    public void HydraulicSetMinSlope()
+    {
+        if (float.TryParse(_hydraulicMinSlopeField.text, out float result))
+        {
+            _hydraulic._minSlope = result;
+        }
+        else
+        {
+            _hydraulicMinSlopeField.text = _hydraulic._minSlope.ToString();
+        }
+    }
+
+    public void SetPerlin()
+    {
+        PerlinSetOctaves();
+        PerlinSetPersistence();
+        PerlinSetOffset();
+        PerlinSetScale();
+    }
+
+    public void SetDiamondSquare()
+    {
+        DSSetOffset();
+        DSSetSmoothness();
+    }
+
+    public void SetWorley()
+    {
+        WorleySetCount();
+        WorleySetDistance();
+    }
+
+    public void SetHydraulic()
+    {
+        HydraulicSetIterations();
+        HydraulicSetParticleCount();
+        HydraulicSetGravity();
+        HydraulicSetErosionRadius();
+        HydraulicSetInertia();
+        HydraulicSetCapacity();
+        HydraulicSetEvaporationSpeed();
+        HydraulicSetDepositSpeed();
+        HydraulicSetMinSlope();
+    }
+
     public void Generate()
     {
         SetSeed();
@@ -288,24 +475,19 @@ public class UIManager : MonoBehaviour
         switch (_terrainGenerator._activeNoise)
         {
             case TerrainGenerator.NoiseType.Perlin:
-                PerlinSetOctaves();
-                PerlinSetPersistence();
-                PerlinSetOffset();
-                PerlinSetScale();
+                SetPerlin();
                 break;
             case TerrainGenerator.NoiseType.DiamondSquare:
-                DSSetOffset();
-                DSSetSmoothness();
+                SetDiamondSquare();
                 break;
             case TerrainGenerator.NoiseType.Worley:
-                WorleySetCount();
-                WorleySetDistance();
+                SetWorley();
                 break;
         }
+        SetHydraulic();
         
         _terrainGenerator.Generate();
     }
     
-    // todo: rotation
-    // todo: diamond-square - offset range, smoothness
+    // todo: erosion: iterations, gravity, radius, inertia, capacity, evaporation speed, deposit speed, minslope
 }

@@ -3,7 +3,7 @@ using Random = UnityEngine.Random;
 
 public class HydraulicErosion : MonoBehaviour
 {
-    public uint _iterations;
+    public int _iterations;
     private float[,] _map;
     private int _mapSize;
 
@@ -18,9 +18,6 @@ public class HydraulicErosion : MonoBehaviour
     [Range(0, 1)] public float _erosionSpeed = 0.1f;
     [Range(0, 1)] public float _depositSpeed = 1.0f;
     public float _minSlope = 0.001f;
-    //public uint _maxPath;
-
-    //private List<Droplet> _droplets;
 
     private void OnValidate()
     {
@@ -114,7 +111,6 @@ public class HydraulicErosion : MonoBehaviour
                     if (deltaHeight > 0.0f) // droplet moved uphill
                     {
                         // drop all sediment
-                        //depositAmount = d.sediment;
                         float amount = Mathf.Min(d.sediment, deltaHeight);
                         d.sediment = Deposit(d, amount);
                     }
@@ -128,8 +124,6 @@ public class HydraulicErosion : MonoBehaviour
                         {
                             //depositAmount = (d.sediment - c) * _depositSpeed;
                             d.sediment = Deposit(d, (d.sediment - c) * _depositSpeed);
-                            // alt:
-                            // depositAmount = Mathf.Min(deltaHeight, sediment);
                         }
                         else
                         {
@@ -300,20 +294,25 @@ public class HydraulicErosion : MonoBehaviour
 
     private float CalculateHeight(Droplet d)
     {
-        Vector2Int iPos = d.posInt;
-        iPos.x = Mathf.Clamp(iPos.x, 0, _mapSize - 1);
-        iPos.y = Mathf.Clamp(iPos.x, 0, _mapSize - 1);
-        float xf = d.position.x - iPos.x;
-        float yf = d.position.y - iPos.y;
+        Vector2Int pos = d.posInt;
+        pos.x = Mathf.Clamp(pos.x, 0, _mapSize - 1);
+        pos.y = Mathf.Clamp(pos.x, 0, _mapSize - 1);
+        float xf = d.position.x - pos.x;
+        float yf = d.position.y - pos.y;
         
         float h00, h10, h01, h11;
-        float[] neighbours = GetNeighbours(iPos);
+        float[] neighbours = GetNeighbours(pos);
         h00 = neighbours[0];
         h10 = neighbours[1];
         h01 = neighbours[2];
         h11 = neighbours[3];
         
         return CalculateHeight(h00, h10, h01, h11, xf, yf);
+    }
+    
+    private float CalculateHeight(float h00, float h10, float h01, float h11, float xf, float yf)
+    {
+        return h01 * (1 - xf) * (1 - yf) + h01 * xf * (1 - yf) + h10 * (1 - xf) * yf + h11 * xf * yf;
     }
 
     private float CalculateHeight2(Vector2 posdif, float[] neighbours)
@@ -338,11 +337,6 @@ public class HydraulicErosion : MonoBehaviour
         float[] neighbours = GetNeighbours(posi);
 
         return CalculateHeight2(posdif, neighbours);
-    }
-    
-    private float CalculateHeight(float h00, float h10, float h01, float h11, float xf, float yf)
-    {
-        return h01 * (1 - xf) * (1 - yf) + h01 * xf * (1 - yf) + h10 * (1 - xf) * yf + h11 * xf * yf;
     }
     
     private HeightAndGradient CalculateHeightAndGradient(Droplet d)
