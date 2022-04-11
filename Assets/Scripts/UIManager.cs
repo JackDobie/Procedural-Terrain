@@ -94,6 +94,17 @@ public class UIManager : MonoBehaviour
                 break;
         }
 
+        _erosionDropdown.value = (int) _terrainGenerator._activeErosion;
+        switch (_terrainGenerator._activeErosion)
+        {
+            case TerrainGenerator.ErosionType.Hydraulic:
+                _hydraulicMenu.SetActive(true);
+                break;
+            default:
+                _hydraulicMenu.SetActive(false);
+                break;
+        }
+
         _hydraulicIterationsField.text = _hydraulic._iterations.ToString();
         _hydraulicParticleCountField.text = _hydraulic._particleCount.ToString();
         _hydraulicGravityField.text = _hydraulic._gravity.ToString();

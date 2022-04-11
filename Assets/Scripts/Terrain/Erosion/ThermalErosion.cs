@@ -15,7 +15,7 @@ public class ThermalErosion : MonoBehaviour
         _mapSize = size;
         if (_minAngle < 0)
         {
-            _minAngle = 4.0f / _iterations;
+            _minAngle = 1;
         }
     }
 
@@ -31,8 +31,8 @@ public class ThermalErosion : MonoBehaviour
             {
                 for (int y = 0; y < size; y++)
                 {
-                    float[] neighbours = GetNeighbours(x, y);
-                    float h00 = _map[x, y];
+                    float[] neighbours = GetNeighbours2(x, y);
+                    float currentCell = _map[x, y];
                     // float h10 = neighbours[0];
                     // float h01 = neighbours[1];
                     // float h11 = neighbours[2];
@@ -42,8 +42,8 @@ public class ThermalErosion : MonoBehaviour
                     int count = 0;
                     for (int i = 0; i < neighbours.Length; i++)
                     {
-                        float di = h00 - neighbours[i];
-                        if (di > 0.0f)
+                        float di = currentCell - neighbours[i];
+                        if (di > _minAngle)
                         {
                             dTotal += di;
                             count++;
@@ -56,38 +56,56 @@ public class ThermalErosion : MonoBehaviour
 
                     for (int i = 0; i < neighbours.Length; i++)
                     {
-                        float di = h00 - neighbours[i];
-                        if (di > 0.0f)
+                        float di = currentCell - neighbours[i];
+                        if (di > _minAngle)
                         {
                             if (count == 1)
                             {
                                 float amount = c * (di - _minAngle);
                                 neighbours[i] += amount;
-                                h00 -= amount;
+                                currentCell -= amount;
                             }
                             else if (count > 1)
                             {
                                 float amount = (c * (dMax - _minAngle)) * di / dTotal;
                                 neighbours[i] += amount;
-                                h00 -= amount;
+                                currentCell -= amount;
                             }
                         }
                     }
 
                     // assign back 
-                    _map[x, y] = h00;
-                    if (x < _mapSize - 1)
+                    _map[x, y] = currentCell;
+                    
+                    if (y > 0)
                     {
-                        _map[x + 1, y] = neighbours[0];
-                        if (y < _mapSize - 1)
-                        {
-                            _map[x + 1, y + 1] = neighbours[2];
-                        }
+                        _map[x, y - 1] = neighbours[0];
                     }
                     if (y < _mapSize - 1)
                     {
                         _map[x, y + 1] = neighbours[1];
                     }
+                    if (x > 0)
+                    {
+                        _map[x - 1, y] = neighbours[2];
+                    }
+                    if (x < _mapSize - 1)
+                    {
+                        _map[x + 1, y] = neighbours[3];
+                    }
+                    
+                    // if (x < _mapSize - 1)
+                    // {
+                    //     _map[x + 1, y] = neighbours[0];
+                    //     if (y < _mapSize - 1)
+                    //     {
+                    //         _map[x + 1, y + 1] = neighbours[2];
+                    //     }
+                    // }
+                    // if (y < _mapSize - 1)
+                    // {
+                    //     _map[x, y + 1] = neighbours[1];
+                    // }
                 }
             }
         }
@@ -95,6 +113,33 @@ public class ThermalErosion : MonoBehaviour
         return _map;
     }
 
+    private float[] GetNeighbours2(int x, int y)
+    {
+        float u, d, l, r;
+        u = d = l = r = _map[x, y];
+
+        float[] neighbours = new float[4];
+
+        if (y > 0)
+        {
+            u = _map[x, y - 1];
+        }
+        if (y < _mapSize - 1)
+        {
+            d = _map[x, y + 1];
+        }
+        if (x > 0)
+        {
+            l = _map[x - 1, y];
+        }
+        if (x < _mapSize - 1)
+        {
+            r = _map[x + 1, y];
+        }
+
+        return new float[] {u, d, l, r};
+    }
+    
     private float[] GetNeighbours(int x, int y)
     {
         float h10, h01, h11;
@@ -109,7 +154,7 @@ public class ThermalErosion : MonoBehaviour
         }
         if (y + 1 < _mapSize)
             h01 = _map[x, y + 1];
-
+        
         return new float[] {h10, h01, h11};
     }
 }
