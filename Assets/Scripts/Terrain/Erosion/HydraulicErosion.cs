@@ -3,10 +3,10 @@ using Random = UnityEngine.Random;
 
 public class HydraulicErosion : MonoBehaviour
 {
-    public int _iterations;
     private float[,] _map;
     private int _mapSize;
 
+    public int _iterations;
     public int _particleCount = 1000;
     public int _lifetime = 30;
     public int _gravity = 4;
@@ -75,10 +75,13 @@ public class HydraulicErosion : MonoBehaviour
     public float[,] ErodeMap(float[,] map, int size, int seed)
     {
         Init(map, size, seed);
+        //Vector2 randpos = new Vector2(100 + Random.Range(0, 10), 100 + Random.Range(0, 10));
         for (int it = 0; it < _iterations; it++)
         {
             for (int i = 0; i < _particleCount; i++)
             {
+                // Droplet d = new Droplet(new Vector2(250 + Random.Range(0, 5), 250 + Random.Range(0, 5)), Vector2.zero,
+                //     0, 0, 0);
                 Droplet d = new Droplet(new Vector2(Random.Range(0, size), Random.Range(0, size)),
                     Vector2.zero, 0, 0, 0);
                 for (int j = 0; j < _lifetime; j++)
@@ -90,8 +93,8 @@ public class HydraulicErosion : MonoBehaviour
                     Vector2 oldDir = d.direction;
                     d.direction = (oldDir * _inertia) - (hg.gradient * (1 - _inertia));
                     d.direction = d.direction.normalized;
-                    d.direction += oldDir;
-                    d.direction = d.direction.normalized;
+                    // d.direction += oldDir;
+                    // d.direction = d.direction.normalized;
 
                     // calculate new position by adding direction to old pos
                     //d.position = oldPos + d.direction;

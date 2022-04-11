@@ -483,8 +483,24 @@ public class UIManager : MonoBehaviour
             case TerrainGenerator.NoiseType.Worley:
                 SetWorley();
                 break;
+            default:
+                // perlin by default
+                SetPerlin();
+                break;
         }
-        SetHydraulic();
+
+        switch (_terrainGenerator._activeErosion)
+        {
+            case TerrainGenerator.ErosionType.None:
+                break;
+            case TerrainGenerator.ErosionType.Hydraulic:
+                SetHydraulic();
+                break;
+            case TerrainGenerator.ErosionType.Thermal:
+                break;
+            default:
+                break;
+        }
         
         _terrainGenerator.Generate();
     }

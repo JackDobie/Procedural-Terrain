@@ -2922,7 +2922,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Hydraulic
+  m_text: None
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -11437,6 +11437,7 @@ GameObject:
   - component: {fileID: 1180547567}
   - component: {fileID: 1180547569}
   - component: {fileID: 1180547571}
+  - component: {fileID: 1180547563}
   m_Layer: 0
   m_Name: Terrain
   m_TagString: Untagged
@@ -11477,12 +11478,27 @@ MonoBehaviour:
   _seed: 66231
   _mapSize: 512
   _maxHeight: 100
-  _activeNoise: 0
+  _activeNoise: 1
   _activeErosion: 0
   _useTerrain: 0
   _terrainMat: {fileID: 2100000, guid: 6eb12f94163d54e458ce7ae26739ca6f, type: 2}
   _rotate: 0
   _rotateSpeed: 10
+--- !u!114 &1180547563
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1180547560}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b9312d737c4ec044a78fdd5f420d438, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _iterations: 10
+  _minAngle: -1
+  c: 0.5
 --- !u!23 &1180547564
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -11623,7 +11639,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c61621698fca7b14cb3bfede54d22d46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _iterations: 0
+  _iterations: 10
   _particleCount: 1000
   _lifetime: 100
   _gravity: 4
@@ -11725,7 +11741,11 @@ MonoBehaviour:
   m_Value: 0
   m_Options:
     m_Options:
+    - m_Text: None
+      m_Image: {fileID: 0}
     - m_Text: Hydraulic
+      m_Image: {fileID: 0}
+    - m_Text: Thermal
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:

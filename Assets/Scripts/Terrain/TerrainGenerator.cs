@@ -3,7 +3,7 @@ using MyBox;
 using UnityEngine;
 
 [RequireComponent(typeof(Perlin), typeof(DiamondSquare), typeof(Worley))]
-[RequireComponent(typeof(HydraulicErosion))]
+[RequireComponent(typeof(HydraulicErosion), typeof(ThermalErosion))]
 [RequireComponent(typeof(MeshFilter))]
 public class TerrainGenerator : MonoBehaviour
 {
@@ -23,6 +23,7 @@ public class TerrainGenerator : MonoBehaviour
     private Worley _worley;
     public ErosionType _activeErosion;
     private HydraulicErosion _hydraulic;
+    private ThermalErosion _thermal;
     [Space]
     private Mesh _mesh;
     private Terrain _terrain;
@@ -46,7 +47,9 @@ public class TerrainGenerator : MonoBehaviour
     
     public enum ErosionType
     {
-        Hydraulic = 0
+        None = 0,
+        Hydraulic,
+        Thermal
     }
 
     private void OnValidate()
@@ -81,6 +84,7 @@ public class TerrainGenerator : MonoBehaviour
         _diamondSquare = gameObject.GetComponent<DiamondSquare>();
         _worley = gameObject.GetComponent<Worley>();
         _hydraulic = gameObject.GetComponent<HydraulicErosion>();
+        _thermal = gameObject.GetComponent<ThermalErosion>();
         
         _mesh = new Mesh
         {
@@ -124,7 +128,25 @@ public class TerrainGenerator : MonoBehaviour
                 heightMap[i, j] *= _maxHeight;
             }
         }
-        float[,] erodedMap = _hydraulic.ErodeMap(heightMap, _mapSize, _seed);
+
+        float[,] erodedMap;
+        switch (_activeErosion)
+        {
+            case ErosionType.None:
+                erodedMap = heightMap;
+                break;
+            case ErosionType.Hydraulic:
+                erodedMap = _hydraulic.ErodeMap(heightMap, _mapSize, _seed);
+                break;
+            case ErosionType.Thermal:
+                erodedMap = _thermal.ErodeHeightMap(heightMap, _mapSize);
+                break;
+            default:
+                // use none as default
+                erodedMap = heightMap;
+                break;
+        }
+        //float[,] erodedMap = _hydraulic.ErodeMap(heightMap, _mapSize, _seed);
         // for (int i = 0; i < _mapSize; i++)
         // {
         //     for (int j = 0; j < _mapSize; j++)
