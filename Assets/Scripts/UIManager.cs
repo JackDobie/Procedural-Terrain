@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
@@ -45,6 +46,8 @@ public class UIManager : MonoBehaviour
     public TMP_InputField _hydraulicEvaporationSpeedField;
     public TMP_InputField _hydraulicDepositSpeedField;
     public TMP_InputField _hydraulicMinSlopeField;
+    [Space]
+    public Toggle _ridgedToggle;
     [Space]
     public TMP_InputField _rotateSpeedField;
 
@@ -114,9 +117,11 @@ public class UIManager : MonoBehaviour
         _hydraulicEvaporationSpeedField.text = _hydraulic._evaporationSpeed.ToString();
         _hydraulicDepositSpeedField.text = _hydraulic._depositSpeed.ToString();
         _hydraulicMinSlopeField.text = _hydraulic._minSlope.ToString();
+
+        _ridgedToggle.isOn = _terrainGenerator._ridged;
     }
 
-    public void SetSeed()
+    private void SetSeed()
     {
         if(int.TryParse(_seedField.text, out int result))
         {
@@ -124,6 +129,12 @@ public class UIManager : MonoBehaviour
         }
         else
         {
+            _seedField.text = _terrainGenerator._seed.ToString();
+        }
+        
+        if (_terrainGenerator._seed == 0)
+        {
+            _terrainGenerator._seed = System.DateTime.Now.Millisecond;
             _seedField.text = _terrainGenerator._seed.ToString();
         }
     }
@@ -157,7 +168,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void SetSize()
+    private void SetSize()
     {
         if(int.TryParse(_sizeField.text, out int result))
         {
@@ -169,7 +180,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void SetHeight()
+    private void SetHeight()
     {
         if(float.TryParse(_heightField.text, out float result))
         {
@@ -180,22 +191,23 @@ public class UIManager : MonoBehaviour
             _heightField.text = _terrainGenerator._maxHeight.ToString();
         }
     }
-    
-    public void PerlinSetOctaves()
+
+    private void PerlinSetOctaves()
     {
         if(int.TryParse(_perlinOctavesField.text, out int result))
         {
-            _perlin.SetOctaves(result);
-            _sizeField.text = _perlin._scale.ToString();
-            //_perlin.SetScale(_perlin._scale).ToString(); // update scale because octaves updated
+            _perlin._octaves = result;
+            // _perlin.SetOctaves(result);
+            // _sizeField.text = _perlin._scale.ToString();
+            // //_perlin.SetScale(_perlin._scale).ToString(); // update scale because octaves updated
         }
         else
         {
             _perlinOctavesField.text = _perlin._octaves.ToString();
         }
     }
-    
-    public void PerlinSetPersistence()
+
+    private void PerlinSetPersistence()
     {
         if(float.TryParse(_perlinPersistenceField.text, out float result))
         {
@@ -207,7 +219,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void PerlinSetOffset()
+    private void PerlinSetOffset()
     {
         float x = _perlin._offset.x;
         float y = _perlin._offset.y;
@@ -232,11 +244,12 @@ public class UIManager : MonoBehaviour
         _perlin._offset = new Vector2(x, y);
     }
 
-    public void PerlinSetScale()
+    private void PerlinSetScale()
     {
         if(float.TryParse(_perlinScaleField.text, out float result))
         {
-            _perlinScaleField.text = _perlin.SetScale(result).ToString();
+            _perlin._scale = result;
+            //_perlinScaleField.text = _perlin.SetScale(result).ToString();
         }
         else
         {
@@ -261,7 +274,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void DSSetOffset()
+    private void DSSetOffset()
     {
         if(float.TryParse(_DSOffsetField.text, out float result))
         {
@@ -273,7 +286,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void DSSetSmoothness()
+    private void DSSetSmoothness()
     {
         if(float.TryParse(_DSSmoothnessField.text, out float result))
         {
@@ -285,7 +298,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void WorleySetCount()
+    private void WorleySetCount()
     {
         if(int.TryParse(_worleyCountField.text, out int result))
         {
@@ -304,7 +317,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void WorleySetDistance()
+    private void WorleySetDistance()
     {
         if(int.TryParse(_worleyDistanceField.text, out int result))
         {
@@ -337,7 +350,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void HydraulicSetIterations()
+    private void HydraulicSetIterations()
     {
         if (int.TryParse(_hydraulicIterationsField.text, out int result))
         {
@@ -349,7 +362,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void HydraulicSetParticleCount()
+    private void HydraulicSetParticleCount()
     {
         if (int.TryParse(_hydraulicParticleCountField.text, out int result))
         {
@@ -361,7 +374,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void HydraulicSetGravity()
+    private void HydraulicSetGravity()
     {
         if (int.TryParse(_hydraulicGravityField.text, out int result))
         {
@@ -372,8 +385,8 @@ public class UIManager : MonoBehaviour
             _hydraulicGravityField.text = _hydraulic._gravity.ToString();
         }
     }
-    
-    public void HydraulicSetErosionRadius()
+
+    private void HydraulicSetErosionRadius()
     {
         if (int.TryParse(_hydraulicErosionRadiusField.text, out int result))
         {
@@ -384,8 +397,8 @@ public class UIManager : MonoBehaviour
             _hydraulicErosionRadiusField.text = _hydraulic._erosionRadius.ToString();
         }
     }
-    
-    public void HydraulicSetInertia()
+
+    private void HydraulicSetInertia()
     {
         if (float.TryParse(_hydraulicInertiaField.text, out float result))
         {
@@ -396,8 +409,8 @@ public class UIManager : MonoBehaviour
             _hydraulicInertiaField.text = _hydraulic._inertia.ToString();
         }
     }
-    
-    public void HydraulicSetCapacity()
+
+    private void HydraulicSetCapacity()
     {
         if (float.TryParse(_hydraulicCapacityField.text, out float result))
         {
@@ -408,8 +421,8 @@ public class UIManager : MonoBehaviour
             _hydraulicCapacityField.text = _hydraulic._capacity.ToString();
         }
     }
-    
-    public void HydraulicSetEvaporationSpeed()
+
+    private void HydraulicSetEvaporationSpeed()
     {
         if (float.TryParse(_hydraulicEvaporationSpeedField.text, out float result))
         {
@@ -420,8 +433,8 @@ public class UIManager : MonoBehaviour
             _hydraulicEvaporationSpeedField.text = _hydraulic._evaporationSpeed.ToString();
         }
     }
-    
-    public void HydraulicSetDepositSpeed()
+
+    private void HydraulicSetDepositSpeed()
     {
         if (float.TryParse(_hydraulicDepositSpeedField.text, out float result))
         {
@@ -432,8 +445,8 @@ public class UIManager : MonoBehaviour
             _hydraulicDepositSpeedField.text = _hydraulic._depositSpeed.ToString();
         }
     }
-    
-    public void HydraulicSetMinSlope()
+
+    private void HydraulicSetMinSlope()
     {
         if (float.TryParse(_hydraulicMinSlopeField.text, out float result))
         {
@@ -445,7 +458,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void SetPerlin()
+    private void SetPerlin()
     {
         PerlinSetOctaves();
         PerlinSetPersistence();
@@ -453,19 +466,19 @@ public class UIManager : MonoBehaviour
         PerlinSetScale();
     }
 
-    public void SetDiamondSquare()
+    private void SetDiamondSquare()
     {
         DSSetOffset();
         DSSetSmoothness();
     }
 
-    public void SetWorley()
+    private void SetWorley()
     {
         WorleySetCount();
         WorleySetDistance();
     }
 
-    public void SetHydraulic()
+    private void SetHydraulic()
     {
         HydraulicSetIterations();
         HydraulicSetParticleCount();
@@ -512,6 +525,8 @@ public class UIManager : MonoBehaviour
             default:
                 break;
         }
+
+        _terrainGenerator._ridged = _ridgedToggle.isOn;
         
         _terrainGenerator.Generate();
     }

@@ -38,6 +38,9 @@ public class TerrainGenerator : MonoBehaviour
     [ConditionalField(nameof(_rotate))]
     public float _rotateSpeed;
 
+    [Space]
+    public bool _ridged = true;
+
     public enum NoiseType
     {
         Perlin = 0,
@@ -139,7 +142,7 @@ public class TerrainGenerator : MonoBehaviour
                 erodedMap = _hydraulic.ErodeMap(heightMap, _mapSize, _seed);
                 break;
             case ErosionType.Thermal:
-                erodedMap = _thermal.ErodeHeightMap(heightMap, _mapSize);
+                erodedMap = _thermal.ErodeHeightMap(heightMap, _mapSize, _maxHeight);
                 break;
             default:
                 // use none as default
@@ -160,7 +163,22 @@ public class TerrainGenerator : MonoBehaviour
         {
             case -1:
                 //Debug.Log("Mesh is ok");
-        
+                for (int i = 0; i < _mapSize; i++)
+                {
+                    for (int j = 0; j < _mapSize; j++)
+                    {
+                        if (_ridged)
+                        {
+                            // make all points positive to give a ridge
+                            erodedMap[i, j] = Mathf.Abs(erodedMap[i, j]);
+                            // invert values. points previously lower than 0 will make a ridge as the highest values
+                            erodedMap[i, j] *= -1;
+                            // add the height of the terrain to make up for the inverted height
+                            erodedMap[i, j] += (erodedMap[i, j] / _maxHeight);
+                        }
+                    }
+                }
+                
                 if (_useTerrain)
                 {
                     _mesh.Clear();

@@ -149,23 +149,26 @@ public class Perlin : MonoBehaviour
         return t * t * t * (t * (t * 6 - 15) + 10);
     }
 
-    public float SetScale(float scale)
-    {
-        _scale = Mathf.Clamp(scale, 0, (_mapSize / _octaves) - 1);
-        return _scale;
-    }
+    // public float SetScale(float scale)
+    // {
+    //     if (_octaves > 0)
+    //     {
+    //         _scale = Mathf.Clamp(scale, 0, (_mapSize / _octaves) - 1);
+    //     }
+    //     return _scale;
+    // }
     
-    public void SetOctaves(int octaves)
-    {
-        _octaves = octaves;
-        if (octaves == 0)
-        {
-            _mapSize = _oldMapSize;
-        }
-        else
-        {
-            _mapSize = _oldMapSize / octaves;
-            SetScale(_scale); //update scale because octaves updated
-        }
-    }
+    // public void SetOctaves(int octaves)
+    // {
+    //     _octaves = octaves;
+    //     if (octaves == 0)
+    //     {
+    //         _mapSize = _oldMapSize;
+    //     }
+    //     else
+    //     {
+    //         _mapSize = _oldMapSize / octaves;
+    //         SetScale(_scale); //update scale because octaves updated
+    //     }
+    // }
 }
