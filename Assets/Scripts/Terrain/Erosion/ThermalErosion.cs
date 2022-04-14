@@ -9,20 +9,19 @@ public class ThermalErosion : MonoBehaviour
     public float _minAngle;
     public float c;
     
-    private void Init(float[,] map, int size, float maxHeight)
+    private void Init(float[,] map, int size)
     {
         _map = map;
         _mapSize = size;
         if (_minAngle < 0)
         {
             _minAngle = 1;
-            //_minAngle = 4 / maxHeight;
         }
     }
 
-    public float[,] ErodeHeightMap(float[,] map, int size, float maxHeight)
+    public float[,] ErodeHeightMap(float[,] map, int size)
     {
-        Init(map, size, maxHeight);
+        Init(map, size);
         // find gradient of current cell by interpolating heights and gradients
         // if angle greater than min angle, distribute an amount until the angle is ok
 

@@ -35,9 +35,9 @@ public class Perlin : MonoBehaviour
     {
         float[,] heightMap = new float[_mapSize, _mapSize];
         
-        for (int i = 0; i < _mapSize; i++)
+        for (int i = 0; i < _mapSize - 1; i++)
         {
-            for(int j = 0; j < _mapSize; j++)
+            for(int j = 0; j < _mapSize - 1; j++)
             {
                 float xCoord = (float)i / _mapSize * _scale + _offset.x;
                 float yCoord = (float)j / _mapSize * _scale + _offset.y;
@@ -79,6 +79,11 @@ public class Perlin : MonoBehaviour
         int x1 = x0 + 1;
         int y0 = Convert.ToInt32(Math.Floor(y));
         int y1 = y0 + 1;
+
+        // x0 = Mathf.Clamp(x0, (int)0, _mapSize - 2);
+        // x1 = Mathf.Clamp(x1, (int)0, _mapSize - 1);
+        // y0 = Mathf.Clamp(y0, (int)0, _mapSize - 2);
+        // y1 = Mathf.Clamp(y1, (int)0, _mapSize - 1);
 
         // find interpolation weights
         float sx = Fade(x - x0);
@@ -134,7 +139,8 @@ public class Perlin : MonoBehaviour
          */
         if (0.0 > w) return a0;
         if (1.0 < w) return a1;
-        return (a1 - a0) * w + a0;
+        //return (a1 - a0) * w + a0;
+        return (a1 - a0) * ((w * (w * 6.0f - 15.0f) + 10.0f) * w * w * w) + a0;
         /* // Use this cubic interpolation [[Smoothstep]] instead, for a smooth appearance:
          * return (a1 - a0) * (3.0 - w * 2.0) * w * w + a0;
          *
@@ -149,26 +155,17 @@ public class Perlin : MonoBehaviour
         return t * t * t * (t * (t * 6 - 15) + 10);
     }
 
-    // public float SetScale(float scale)
-    // {
-    //     if (_octaves > 0)
-    //     {
-    //         _scale = Mathf.Clamp(scale, 0, (_mapSize / _octaves) - 1);
-    //     }
-    //     return _scale;
-    // }
-    
-    // public void SetOctaves(int octaves)
-    // {
-    //     _octaves = octaves;
-    //     if (octaves == 0)
-    //     {
-    //         _mapSize = _oldMapSize;
-    //     }
-    //     else
-    //     {
-    //         _mapSize = _oldMapSize / octaves;
-    //         SetScale(_scale); //update scale because octaves updated
-    //     }
-    // }
+    public float SetScale(float scale)
+    {
+        if (_octaves > 0)
+        {
+            int maxscale = _mapSize;
+            for (int i = 1; i < _octaves; i++)
+            {
+                maxscale /= 2;
+            }
+            _scale = Mathf.Clamp(scale, 0, maxscale);
+        }
+        return _scale;
+    }
 }

@@ -142,7 +142,7 @@ public class TerrainGenerator : MonoBehaviour
                 erodedMap = _hydraulic.ErodeMap(heightMap, _mapSize, _seed);
                 break;
             case ErosionType.Thermal:
-                erodedMap = _thermal.ErodeHeightMap(heightMap, _mapSize, _maxHeight);
+                erodedMap = _thermal.ErodeHeightMap(heightMap, _mapSize);
                 break;
             default:
                 // use none as default

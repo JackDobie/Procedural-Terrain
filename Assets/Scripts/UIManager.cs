@@ -197,9 +197,6 @@ public class UIManager : MonoBehaviour
         if(int.TryParse(_perlinOctavesField.text, out int result))
         {
             _perlin._octaves = result;
-            // _perlin.SetOctaves(result);
-            // _sizeField.text = _perlin._scale.ToString();
-            // //_perlin.SetScale(_perlin._scale).ToString(); // update scale because octaves updated
         }
         else
         {
@@ -248,8 +245,8 @@ public class UIManager : MonoBehaviour
     {
         if(float.TryParse(_perlinScaleField.text, out float result))
         {
-            _perlin._scale = result;
-            //_perlinScaleField.text = _perlin.SetScale(result).ToString();
+            // _perlin._scale = result;
+            _perlinScaleField.text = _perlin.SetScale(result).ToString();
         }
         else
         {
