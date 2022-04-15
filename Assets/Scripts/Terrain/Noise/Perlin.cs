@@ -6,7 +6,6 @@ using Random = UnityEngine.Random;
 public class Perlin : MonoBehaviour
 {
     private int _mapSize;
-    private int _oldMapSize;
     public int _octaves;
     [ConditionalField(nameof(_octaves), true, 0)]
     public float _persistence;
@@ -27,7 +26,6 @@ public class Perlin : MonoBehaviour
     public void Init(int seed, int mapSize)
     {
         _mapSize = mapSize;
-        _oldMapSize = _mapSize;
         _gradients = GenerateGridGradients(seed);
     }
 
@@ -35,9 +33,9 @@ public class Perlin : MonoBehaviour
     {
         float[,] heightMap = new float[_mapSize, _mapSize];
         
-        for (int i = 0; i < _mapSize - 1; i++)
+        for (int i = 0; i < _mapSize; i++)
         {
-            for(int j = 0; j < _mapSize - 1; j++)
+            for(int j = 0; j < _mapSize; j++)
             {
                 float xCoord = (float)i / _mapSize * _scale + _offset.x;
                 float yCoord = (float)j / _mapSize * _scale + _offset.y;
@@ -91,11 +89,11 @@ public class Perlin : MonoBehaviour
 
         float n0 = DotGridGradient(x0, y0, x, y);
         float n1 = DotGridGradient(x1, y0, x, y);
-        float ix0 = Interpolate(n0, n1, sx);
+        float ix0 = Mathf.Lerp(n0, n1, sx);
         n0 = DotGridGradient(x0, y1, x, y);
         n1 = DotGridGradient(x1, y1, x, y);
-        float ix1 = Interpolate(n0, n1, sx);
-        float result = Interpolate(ix0, ix1, sy);
+        float ix1 = Mathf.Lerp(n0, n1, sx);
+        float result = Mathf.Lerp(ix0, ix1, sy);
 
         return result;
 	}
@@ -131,23 +129,22 @@ public class Perlin : MonoBehaviour
         return (dx * gradient.x + dy * gradient.y);
     }
 
-    private float Interpolate(float a0, float a1, float w)
-    {
-        /* // You may want clamping by inserting:
-         * if (0.0 > w) return a0;
-         * if (1.0 < w) return a1;
-         */
-        if (0.0 > w) return a0;
-        if (1.0 < w) return a1;
-        //return (a1 - a0) * w + a0;
-        return (a1 - a0) * ((w * (w * 6.0f - 15.0f) + 10.0f) * w * w * w) + a0;
-        /* // Use this cubic interpolation [[Smoothstep]] instead, for a smooth appearance:
-         * return (a1 - a0) * (3.0 - w * 2.0) * w * w + a0;
-         *
-         * // Use [[Smootherstep]] for an even smoother result with a second derivative equal to zero on boundaries:
-         * return (a1 - a0) * ((w * (w * 6.0 - 15.0) + 10.0) * w * w * w) + a0;
-         */
-    }
+    // private float Interpolate(float a0, float a1, float w)
+    // {
+    //     /* // You may want clamping by inserting:
+    //      * if (0.0 > w) return a0;
+    //      * if (1.0 < w) return a1;
+    //      */
+    //     if (0.0 > w) return a0;
+    //     if (1.0 < w) return a1;
+    //     return (a1 - a0) * w + a0;
+    //     /* // Use this cubic interpolation [[Smoothstep]] instead, for a smooth appearance:
+    //      * return (a1 - a0) * (3.0 - w * 2.0) * w * w + a0;
+    //      *
+    //      * // Use [[Smootherstep]] for an even smoother result with a second derivative equal to zero on boundaries:
+    //      * return (a1 - a0) * ((w * (w * 6.0 - 15.0) + 10.0) * w * w * w) + a0;
+    //      */
+    // }
 
     // Fade function defined by Ken Perlin. Eases coordinate values so that they will ease towards integral values. This smooths the final output
     private float Fade(float t)
@@ -164,6 +161,7 @@ public class Perlin : MonoBehaviour
             {
                 maxscale /= 2;
             }
+            maxscale--;
             _scale = Mathf.Clamp(scale, 0, maxscale);
         }
         return _scale;

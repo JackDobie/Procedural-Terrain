@@ -21,7 +21,6 @@ public class DiamondSquare : MonoBehaviour
         // set seed for random number generator
         Random.InitState(seed);
         
-        //todo: create island option by setting these to min height
         float[,] heightMap = new float[size + 1, size + 1];
         heightMap[0, 0] = RandomRange(range); // top left
         heightMap[0, size] = RandomRange(range); // top right
@@ -81,7 +80,6 @@ public class DiamondSquare : MonoBehaviour
                     
                     heightMap[x, y] = average;
                     
-                    //todo: add edge case
                     if (x == 0)
                     {
                         heightMap[size - 1, y] = average;

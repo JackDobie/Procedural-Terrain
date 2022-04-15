@@ -52,7 +52,8 @@ public class TerrainGenerator : MonoBehaviour
     {
         None = 0,
         Hydraulic,
-        Thermal
+        Thermal,
+        Both
     }
 
     private void OnValidate()
@@ -143,6 +144,10 @@ public class TerrainGenerator : MonoBehaviour
                 break;
             case ErosionType.Thermal:
                 erodedMap = _thermal.ErodeHeightMap(heightMap, _mapSize);
+                break;
+            case ErosionType.Both:
+                erodedMap = _hydraulic.ErodeMap(heightMap, _mapSize, _seed);
+                erodedMap = _thermal.ErodeHeightMap(erodedMap, _mapSize);
                 break;
             default:
                 // use none as default

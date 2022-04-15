@@ -33,6 +33,7 @@ public class UIManager : MonoBehaviour
     public TMP_InputField _worleyDistanceField;
     [Header("Erosion")]
     public HydraulicErosion _hydraulic;
+    public ThermalErosion _thermal;
     [Space]
     public TMP_Dropdown _erosionDropdown;
     [Header("Hydraulic Erosion")]
@@ -43,15 +44,21 @@ public class UIManager : MonoBehaviour
     public TMP_InputField _hydraulicErosionRadiusField;
     public TMP_InputField _hydraulicInertiaField;
     public TMP_InputField _hydraulicCapacityField;
+    public TMP_InputField _hydraulicErosionSpeedField;
     public TMP_InputField _hydraulicEvaporationSpeedField;
     public TMP_InputField _hydraulicDepositSpeedField;
     public TMP_InputField _hydraulicMinSlopeField;
+    [Header("Thermal Erosion")]
+    public GameObject _thermalMenu;
+    public TMP_InputField _thermalIterationsField;
+    public TMP_InputField _thermalMinAngleField;
+    public TMP_InputField _thermalCapacityField;
     [Space]
     public Toggle _ridgedToggle;
     [Space]
     public TMP_InputField _rotateSpeedField;
 
-    private void Awake()
+    private void Start()
     {
         _seedField.characterLimit = int.MaxValue.ToString().Length - 1;
         _seedField.text = _terrainGenerator._seed.ToString();
@@ -102,9 +109,19 @@ public class UIManager : MonoBehaviour
         {
             case TerrainGenerator.ErosionType.Hydraulic:
                 _hydraulicMenu.SetActive(true);
+                _thermalMenu.SetActive(false);
+                break;
+            case TerrainGenerator.ErosionType.Thermal:
+                _hydraulicMenu.SetActive(false);
+                _thermalMenu.SetActive(true);
+                break;
+            case TerrainGenerator.ErosionType.Both:
+                _hydraulicMenu.SetActive(true);
+                _thermalMenu.SetActive(true);
                 break;
             default:
                 _hydraulicMenu.SetActive(false);
+                _thermalMenu.SetActive(false);
                 break;
         }
 
@@ -115,8 +132,13 @@ public class UIManager : MonoBehaviour
         _hydraulicInertiaField.text = _hydraulic._inertia.ToString();
         _hydraulicCapacityField.text = _hydraulic._capacity.ToString();
         _hydraulicEvaporationSpeedField.text = _hydraulic._evaporationSpeed.ToString();
+        _hydraulicErosionSpeedField.text = _hydraulic._erosionSpeed.ToString();
         _hydraulicDepositSpeedField.text = _hydraulic._depositSpeed.ToString();
         _hydraulicMinSlopeField.text = _hydraulic._minSlope.ToString();
+
+        _thermalIterationsField.text = _thermal._iterations.ToString();
+        _thermalMinAngleField.text = _thermal._minAngle.ToString();
+        _thermalCapacityField.text = _thermal._capacity.ToString();
 
         _ridgedToggle.isOn = _terrainGenerator._ridged;
     }
@@ -218,11 +240,13 @@ public class UIManager : MonoBehaviour
 
     private void PerlinSetOffset()
     {
+        float maxSize = _terrainGenerator._mapSize > 0 ? (_terrainGenerator._mapSize - _perlin._scale - 1) : 0;
         float x = _perlin._offset.x;
         float y = _perlin._offset.y;
         if(float.TryParse(_perlinOffsetXField.text, out float i))
         {
-            x = i;
+            x = Mathf.Clamp(i, 0, maxSize);
+            _perlinOffsetXField.text = x.ToString();
         }
         else
         {
@@ -231,13 +255,14 @@ public class UIManager : MonoBehaviour
         
         if(float.TryParse(_perlinOffsetYField.text, out float j))
         {
-            y = j;
+            y = Mathf.Clamp(j, 0, maxSize);
+            _perlinOffsetYField.text = y.ToString();
         }
         else
         {
             _perlinOffsetYField.text = y.ToString();
         }
-
+        
         _perlin._offset = new Vector2(x, y);
     }
 
@@ -340,9 +365,19 @@ public class UIManager : MonoBehaviour
         {
             case TerrainGenerator.ErosionType.Hydraulic:
                 _hydraulicMenu.SetActive(true);
+                _thermalMenu.SetActive(false);
+                break;
+            case TerrainGenerator.ErosionType.Thermal:
+                _hydraulicMenu.SetActive(false);
+                _thermalMenu.SetActive(true);
+                break;
+            case TerrainGenerator.ErosionType.Both:
+                _hydraulicMenu.SetActive(true);
+                _thermalMenu.SetActive(true);
                 break;
             default:
                 _hydraulicMenu.SetActive(false);
+                _thermalMenu.SetActive(false);
                 break;
         }
     }
@@ -430,6 +465,18 @@ public class UIManager : MonoBehaviour
             _hydraulicEvaporationSpeedField.text = _hydraulic._evaporationSpeed.ToString();
         }
     }
+    
+    private void HydraulicSetErosionSpeed()
+    {
+        if (float.TryParse(_hydraulicErosionSpeedField.text, out float result))
+        {
+            _hydraulic._erosionSpeed = result;
+        }
+        else
+        {
+            _hydraulicErosionSpeedField.text = _hydraulic._erosionSpeed.ToString();
+        }
+    }
 
     private void HydraulicSetDepositSpeed()
     {
@@ -452,6 +499,42 @@ public class UIManager : MonoBehaviour
         else
         {
             _hydraulicMinSlopeField.text = _hydraulic._minSlope.ToString();
+        }
+    }
+    
+    private void ThermalSetIterations()
+    {
+        if (int.TryParse(_thermalIterationsField.text, out int result))
+        {
+            _thermal._iterations = result;
+        }
+        else
+        {
+            _thermalIterationsField.text = _thermal._iterations.ToString();
+        }
+    }
+    
+    private void ThermalSetMinAngle()
+    {
+        if (float.TryParse(_thermalMinAngleField.text, out float result))
+        {
+            _thermal._minAngle = result;
+        }
+        else
+        {
+            _thermalMinAngleField.text = _thermal._minAngle.ToString();
+        }
+    }
+    
+    private void ThermalSetCapacity()
+    {
+        if (float.TryParse(_thermalCapacityField.text, out float result))
+        {
+            _thermal._capacity = result;
+        }
+        else
+        {
+            _thermalCapacityField.text = _thermal._capacity.ToString();
         }
     }
 
@@ -484,8 +567,16 @@ public class UIManager : MonoBehaviour
         HydraulicSetInertia();
         HydraulicSetCapacity();
         HydraulicSetEvaporationSpeed();
+        HydraulicSetErosionSpeed();
         HydraulicSetDepositSpeed();
         HydraulicSetMinSlope();
+    }
+
+    private void SetThermal()
+    {
+        ThermalSetIterations();
+        ThermalSetMinAngle();
+        ThermalSetCapacity();
     }
 
     public void Generate()
@@ -512,12 +603,15 @@ public class UIManager : MonoBehaviour
 
         switch (_terrainGenerator._activeErosion)
         {
-            case TerrainGenerator.ErosionType.None:
-                break;
             case TerrainGenerator.ErosionType.Hydraulic:
                 SetHydraulic();
                 break;
             case TerrainGenerator.ErosionType.Thermal:
+                SetThermal();
+                break;
+            case TerrainGenerator.ErosionType.Both:
+                SetHydraulic();
+                SetThermal();
                 break;
             default:
                 break;
@@ -527,6 +621,4 @@ public class UIManager : MonoBehaviour
         
         _terrainGenerator.Generate();
     }
-    
-    // todo: erosion: iterations, gravity, radius, inertia, capacity, evaporation speed, deposit speed, minslope
 }

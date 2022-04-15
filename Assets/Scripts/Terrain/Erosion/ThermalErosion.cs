@@ -7,7 +7,7 @@ public class ThermalErosion : MonoBehaviour
 
     public int _iterations;
     public float _minAngle;
-    public float c;
+    public float _capacity;
     
     private void Init(float[,] map, int size)
     {
@@ -61,13 +61,13 @@ public class ThermalErosion : MonoBehaviour
                         {
                             if (count == 1)
                             {
-                                float amount = c * (di - _minAngle);
+                                float amount = _capacity * (di - _minAngle);
                                 neighbours[i] += amount;
                                 currentCell -= amount;
                             }
                             else if (count > 1)
                             {
-                                float amount = (c * (dMax - _minAngle)) * di / dTotal;
+                                float amount = (_capacity * (dMax - _minAngle)) * di / dTotal;
                                 neighbours[i] += amount;
                                 currentCell -= amount;
                             }
