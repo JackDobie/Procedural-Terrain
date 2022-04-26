@@ -31,7 +31,7 @@ public class ThermalErosion : MonoBehaviour
             {
                 for (int y = 0; y < size; y++)
                 {
-                    float[] neighbours = GetNeighbours2(x, y);
+                    float[] neighbours = GetNeighbours(x, y);
                     float currentCell = _map[x, y];
                     // float h10 = neighbours[0];
                     // float h01 = neighbours[1];
@@ -93,19 +93,6 @@ public class ThermalErosion : MonoBehaviour
                     {
                         _map[x + 1, y] = neighbours[3];
                     }
-                    
-                    // if (x < _mapSize - 1)
-                    // {
-                    //     _map[x + 1, y] = neighbours[0];
-                    //     if (y < _mapSize - 1)
-                    //     {
-                    //         _map[x + 1, y + 1] = neighbours[2];
-                    //     }
-                    // }
-                    // if (y < _mapSize - 1)
-                    // {
-                    //     _map[x, y + 1] = neighbours[1];
-                    // }
                 }
             }
         }
@@ -113,12 +100,10 @@ public class ThermalErosion : MonoBehaviour
         return _map;
     }
 
-    private float[] GetNeighbours2(int x, int y)
+    private float[] GetNeighbours(int x, int y)
     {
         float u, d, l, r;
         u = d = l = r = _map[x, y];
-
-        float[] neighbours = new float[4];
 
         if (y > 0)
         {
@@ -138,23 +123,5 @@ public class ThermalErosion : MonoBehaviour
         }
 
         return new float[] {u, d, l, r};
-    }
-    
-    private float[] GetNeighbours(int x, int y)
-    {
-        float h10, h01, h11;
-        h10 = h01 = h11 = _map[x, y];
-        // if out of bounds, set to current cell (h00)
-        if (x + 1 < _mapSize)
-        {
-            h10 = _map[x + 1, y];
-            
-            if (y + 1 < _mapSize)
-                h11 = _map[x + 1, y + 1];
-        }
-        if (y + 1 < _mapSize)
-            h01 = _map[x, y + 1];
-        
-        return new float[] {h10, h01, h11};
     }
 }
