@@ -140,7 +140,7 @@ public class UIManager : MonoBehaviour
         _thermalMinAngleField.text = _thermal._minAngle.ToString();
         _thermalCapacityField.text = _thermal._capacity.ToString();
 
-        _ridgedToggle.isOn = _terrainGenerator._ridged;
+        _ridgedToggle.isOn = _perlin._ridged;
     }
 
     private void SetSeed()
@@ -544,6 +544,7 @@ public class UIManager : MonoBehaviour
         PerlinSetPersistence();
         PerlinSetOffset();
         PerlinSetScale();
+        _perlin._ridged = _ridgedToggle.isOn;
     }
 
     private void SetDiamondSquare()
@@ -616,8 +617,6 @@ public class UIManager : MonoBehaviour
             default:
                 break;
         }
-
-        _terrainGenerator._ridged = _ridgedToggle.isOn;
         
         _terrainGenerator.Generate();
     }

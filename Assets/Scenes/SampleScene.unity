@@ -12858,6 +12858,7 @@ MonoBehaviour:
   _persistence: 0.5
   _offset: {x: 0, y: 0}
   _scale: 2
+  _ridged: 1
 --- !u!114 &1180547562
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12881,7 +12882,6 @@ MonoBehaviour:
   _terrainMat: {fileID: 2100000, guid: 6eb12f94163d54e458ce7ae26739ca6f, type: 2}
   _rotate: 0
   _rotateSpeed: 10
-  _ridged: 1
 --- !u!114 &1180547563
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -38,9 +38,6 @@ public class TerrainGenerator : MonoBehaviour
     [ConditionalField(nameof(_rotate))]
     public float _rotateSpeed;
 
-    [Space]
-    public bool _ridged = true;
-
     public enum NoiseType
     {
         Perlin = 0,
@@ -111,7 +108,7 @@ public class TerrainGenerator : MonoBehaviour
         switch (_activeNoise)
         {
             case NoiseType.Perlin:
-                _perlin.Init(_seed, _mapSize);
+                _perlin.Init(_seed, _mapSize, _maxHeight);
                 heightMap = _perlin.GenerateHeightMap();
                 break;
             case NoiseType.DiamondSquare:
@@ -121,7 +118,7 @@ public class TerrainGenerator : MonoBehaviour
                 heightMap = _worley.GenerateHeightMap(_seed, _mapSize);
                 break;
             default: // use perlin as default
-                _perlin.Init(_seed, _mapSize);
+                _perlin.Init(_seed, _mapSize, _maxHeight);
                 heightMap = _perlin.GenerateHeightMap();
                 break;
         }
@@ -167,23 +164,7 @@ public class TerrainGenerator : MonoBehaviour
         switch (result[0])
         {
             case -1:
-                //Debug.Log("Mesh is ok");
-                for (int i = 0; i < _mapSize; i++)
-                {
-                    for (int j = 0; j < _mapSize; j++)
-                    {
-                        if (_ridged)
-                        {
-                            // make all points positive to give a ridge
-                            erodedMap[i, j] = Mathf.Abs(erodedMap[i, j]);
-                            // invert values. points previously lower than 0 will make a ridge as the highest values
-                            erodedMap[i, j] *= -1;
-                            // add the height of the terrain to make up for the inverted height
-                            erodedMap[i, j] += (erodedMap[i, j] / _maxHeight);
-                        }
-                    }
-                }
-                
+                // Mesh is ok
                 if (_useTerrain)
                 {
                     _mesh.Clear();

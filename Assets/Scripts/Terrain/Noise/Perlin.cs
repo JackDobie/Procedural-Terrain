@@ -5,6 +5,7 @@ using Random = UnityEngine.Random;
 
 public class Perlin : MonoBehaviour
 {
+    private float _maxHeight;
     private int _mapSize;
     public int _octaves;
     [ConditionalField(nameof(_octaves), true, 0)]
@@ -12,6 +13,9 @@ public class Perlin : MonoBehaviour
     [Space]
     public Vector2 _offset;
     public float _scale;
+
+    [Space]
+    public bool _ridged = true;
 
     private Vector2[,] _gradients;
     
@@ -23,10 +27,11 @@ public class Perlin : MonoBehaviour
         _offset.y = Mathf.Clamp(_offset.y, 0, maxSize);
     }
     
-    public void Init(int seed, int mapSize)
+    public void Init(int seed, int mapSize, float maxHeight)
     {
         _mapSize = mapSize;
         _gradients = GenerateGridGradients(seed);
+        _maxHeight = maxHeight;
     }
 
     public float[,] GenerateHeightMap()
@@ -95,6 +100,13 @@ public class Perlin : MonoBehaviour
         float ix1 = Mathf.Lerp(n0, n1, sx);
         float result = Mathf.Lerp(ix0, ix1, sy);
 
+        if (_ridged)
+        {
+            result = Mathf.Abs(result);
+            result *= -1;
+            result += result / _maxHeight;
+        }
+        
         return result;
 	}
 
