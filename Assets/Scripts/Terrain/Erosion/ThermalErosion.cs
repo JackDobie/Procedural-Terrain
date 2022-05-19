@@ -22,6 +22,7 @@ public class ThermalErosion : MonoBehaviour
     public float[,] ErodeHeightMap(float[,] map, int size)
     {
         Init(map, size);
+        
         // find gradient of current cell by interpolating heights and gradients
         // if angle greater than min angle, distribute an amount until the angle is ok
 
@@ -33,9 +34,6 @@ public class ThermalErosion : MonoBehaviour
                 {
                     float[] neighbours = GetNeighbours(x, y);
                     float currentCell = _map[x, y];
-                    // float h10 = neighbours[0];
-                    // float h01 = neighbours[1];
-                    // float h11 = neighbours[2];
 
                     float dMax = 0.0f;
                     float dTotal = 0.0f;

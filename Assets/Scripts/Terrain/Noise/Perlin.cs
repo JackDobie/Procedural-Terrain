@@ -40,7 +40,7 @@ public class Perlin : MonoBehaviour
         
         for (int i = 0; i < _mapSize; i++)
         {
-            for(int j = 0; j < _mapSize; j++)
+            for (int j = 0; j < _mapSize; j++)
             {
                 float xCoord = (float)i / _mapSize * _scale + _offset.x;
                 float yCoord = (float)j / _mapSize * _scale + _offset.y;
@@ -82,11 +82,6 @@ public class Perlin : MonoBehaviour
         int x1 = x0 + 1;
         int y0 = Convert.ToInt32(Math.Floor(y));
         int y1 = y0 + 1;
-
-        // x0 = Mathf.Clamp(x0, (int)0, _mapSize - 2);
-        // x1 = Mathf.Clamp(x1, (int)0, _mapSize - 1);
-        // y0 = Mathf.Clamp(y0, (int)0, _mapSize - 2);
-        // y1 = Mathf.Clamp(y1, (int)0, _mapSize - 1);
 
         // find interpolation weights
         float sx = Fade(x - x0);
@@ -140,23 +135,6 @@ public class Perlin : MonoBehaviour
         // find the dot product
         return (dx * gradient.x + dy * gradient.y);
     }
-
-    // private float Interpolate(float a0, float a1, float w)
-    // {
-    //     /* // You may want clamping by inserting:
-    //      * if (0.0 > w) return a0;
-    //      * if (1.0 < w) return a1;
-    //      */
-    //     if (0.0 > w) return a0;
-    //     if (1.0 < w) return a1;
-    //     return (a1 - a0) * w + a0;
-    //     /* // Use this cubic interpolation [[Smoothstep]] instead, for a smooth appearance:
-    //      * return (a1 - a0) * (3.0 - w * 2.0) * w * w + a0;
-    //      *
-    //      * // Use [[Smootherstep]] for an even smoother result with a second derivative equal to zero on boundaries:
-    //      * return (a1 - a0) * ((w * (w * 6.0 - 15.0) + 10.0) * w * w * w) + a0;
-    //      */
-    // }
 
     // Fade function defined by Ken Perlin. Eases coordinate values so that they will ease towards integral values. This smooths the final output
     private float Fade(float t)

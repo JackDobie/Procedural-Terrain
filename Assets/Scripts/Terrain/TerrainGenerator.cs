@@ -190,14 +190,15 @@ public class TerrainGenerator : MonoBehaviour
         int size = (int)Mathf.Sqrt(map.Length);
         List<Vector3> verts = new List<Vector3>();
         List<int> tris = new List<int>();
-        for(int i = 0; i < size; i++)
+        for (int i = 0; i < size; i++)
         {
-            for(int j = 0; j < size; j++)
+            for (int j = 0; j < size; j++)
             {
                 // add a new vertex using the heightmap data for Y
                 float y = map[i, j];
-                verts.Add(new Vector3(i, y/* * _maxHeight*/, j));
+                verts.Add(new Vector3(i, y, j));
 
+                // ensure i and j are above 0 so can be subtracted from
                 if (i == 0 || j == 0) continue;
 
                 // adds the indexes of three verts in order to make up each of two triangles

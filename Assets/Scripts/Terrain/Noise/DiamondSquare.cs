@@ -45,7 +45,6 @@ public class DiamondSquare : MonoBehaviour
                     average *= 0.25f; // divide by 4
                     
                     // add a random offset to the centre of the points
-                    //average += (Random.value * (range * 2.0f)) - range;
                     average += RandomRange(range);
                     
                     if(_clamp)
@@ -69,8 +68,6 @@ public class DiamondSquare : MonoBehaviour
                     average *= 0.25f;
                     
                     //add random offset
-                    //average += Random.Range(0, range);
-                    //average += (Random.value * (range * 2.0f)) - range;
                     average += RandomRange(range);
                     
                     if(_clamp)
@@ -101,6 +98,5 @@ public class DiamondSquare : MonoBehaviour
     private float RandomRange(float range)
     {
         return (Random.value * (range * 2.0f)) - range;
-        //return min + Random.value * (max - min);
     }
 }
