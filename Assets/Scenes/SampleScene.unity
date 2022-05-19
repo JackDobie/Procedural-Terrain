@@ -12828,7 +12828,6 @@ GameObject:
   - component: {fileID: 1180547566}
   - component: {fileID: 1180547565}
   - component: {fileID: 1180547564}
-  - component: {fileID: 1180547568}
   - component: {fileID: 1180547562}
   - component: {fileID: 1180547561}
   - component: {fileID: 1180547567}
@@ -12878,8 +12877,6 @@ MonoBehaviour:
   _maxHeight: 200
   _activeNoise: 0
   _activeErosion: 1
-  _useTerrain: 0
-  _terrainMat: {fileID: 2100000, guid: 6eb12f94163d54e458ce7ae26739ca6f, type: 2}
   _rotate: 0
   _rotateSpeed: 10
 --- !u!114 &1180547563
@@ -12976,40 +12973,6 @@ MonoBehaviour:
   _offsetRange: 1
   _smoothness: 1
   _clamp: 1
---- !u!218 &1180547568
-Terrain:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1180547560}
-  m_Enabled: 1
-  serializedVersion: 6
-  m_TerrainData: {fileID: 0}
-  m_TreeDistance: 5000
-  m_TreeBillboardDistance: 50
-  m_TreeCrossFadeLength: 5
-  m_TreeMaximumFullLODCount: 50
-  m_DetailObjectDistance: 80
-  m_DetailObjectDensity: 1
-  m_HeightmapPixelError: 5
-  m_SplatMapDistance: 1000
-  m_HeightmapMaximumLOD: 0
-  m_ShadowCastingMode: 2
-  m_DrawHeightmap: 1
-  m_DrawInstanced: 0
-  m_DrawTreesAndFoliage: 1
-  m_StaticShadowCaster: 0
-  m_ReflectionProbeUsage: 1
-  m_MaterialTemplate: {fileID: 0}
-  m_BakeLightProbesForTrees: 1
-  m_PreserveTreePrototypeLayers: 0
-  m_DeringLightProbesForTrees: 1
-  m_ScaleInLightmap: 1
-  m_LightmapParameters: {fileID: 15203, guid: 0000000000000000f000000000000000, type: 0}
-  m_GroupingID: 0
-  m_RenderingLayerMask: 1
-  m_AllowAutoConnect: 0
 --- !u!114 &1180547569
 MonoBehaviour:
   m_ObjectHideFlags: 0

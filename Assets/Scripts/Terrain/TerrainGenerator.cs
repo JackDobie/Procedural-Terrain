@@ -26,12 +26,6 @@ public class TerrainGenerator : MonoBehaviour
     private ThermalErosion _thermal;
     [Space]
     private Mesh _mesh;
-    private Terrain _terrain;
-    
-    [Space]
-    [SerializeField] private bool _useTerrain;
-    [ConditionalField(nameof(_useTerrain))]
-    [SerializeField] private Material _terrainMat;
     
     [Space]
     public bool _rotate;
@@ -93,7 +87,6 @@ public class TerrainGenerator : MonoBehaviour
             indexFormat = UnityEngine.Rendering.IndexFormat.UInt32
         };
         GetComponent<MeshFilter>().mesh = _mesh;
-        _terrain = GetComponent<Terrain>();
     }
 
     private void Start()
@@ -164,18 +157,7 @@ public class TerrainGenerator : MonoBehaviour
         switch (result[0])
         {
             case -1:
-                // Mesh is ok
-                if (_useTerrain)
-                {
-                    _mesh.Clear();
-                    _terrain.enabled = true;
-                    GenerateTerrain(erodedMap);
-                }
-                else
-                {
-                    _terrain.enabled = false;
-                    GenerateMesh(erodedMap);
-                }
+                GenerateMesh(erodedMap);
                 break;
             default:
                 Debug.Log("Mesh not ok - broke at " + result[0] + "," + result[1]);
@@ -187,28 +169,20 @@ public class TerrainGenerator : MonoBehaviour
         Quaternion prevRotation = _pivotPoint.rotation;
         _pivotPoint.rotation = Quaternion.identity;
         
-        // subtract position by half mapsize to make it rotate around 0,0
         Vector3 position = transform.position;
-        transform.position = new Vector3(position.x - (_mapSize * 0.5f), position.y, position.z - (_mapSize * 0.5f));
+        // subtract position by half mapsize to make it rotate around 0,0
+        float newX = position.x - (_mapSize * 0.5f);
+        float newZ = position.x - (_mapSize * 0.5f);
+        // add the difference between mapsize and ideal size to make it appear same place on the screen regardless of size
+        // prevents large maps being too big to see
+        float newY = position.y + ((256 - _mapSize) * 0.5f);
+        transform.position = new Vector3(newX, newY, newZ);
 
         // set camera pos
         _camera.transform.position = new Vector3(-(_mapSize * 0.5f) - (_mapSize * 0.2f), _camera.transform.position.y, 0.0f);
         
         // reset rotation back to previous state
         _pivotPoint.rotation = prevRotation;
-    }
-
-    private void GenerateTerrain(float[,] map)
-    {
-        int size = (int)Mathf.Sqrt(map.Length);
-        TerrainData t = new TerrainData
-        {
-            heightmapResolution = size,
-            size = new Vector3(size, _maxHeight, size),
-        };
-        t.SetHeights(0, 0, map);
-        _terrain.terrainData = t;
-        _terrain.materialTemplate = _terrainMat;
     }
 
     private void GenerateMesh(float[,] map)
@@ -285,13 +259,6 @@ public class TerrainGenerator : MonoBehaviour
                 }
             }
         }
-        // foreach (Vector3 v in m.vertices)
-        // {
-        //     if (!IsFinite(v.x) || !IsFinite(v.y) || !IsFinite(v.z))
-        //     {
-        //         return false;
-        //     }
-        // }
 
         return new float[] {-1};
     }
