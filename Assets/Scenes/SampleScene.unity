@@ -12853,11 +12853,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: faf2105d26f7b5341a93f911e41d082a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _octaves: 4
+  _octaves: 1
   _persistence: 0.5
   _offset: {x: 0, y: 0}
-  _scale: 2
-  _ridged: 1
+  _scale: 5
+  _ridged: 0
 --- !u!114 &1180547562
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12874,9 +12874,9 @@ MonoBehaviour:
   _pivotPoint: {fileID: 916279012}
   _seed: 3926
   _mapSize: 256
-  _maxHeight: 200
+  _maxHeight: 100
   _activeNoise: 0
-  _activeErosion: 1
+  _activeErosion: 0
   _rotate: 0
   _rotateSpeed: 10
 --- !u!114 &1180547563
